@@ -1,0 +1,6 @@
+flask
+ultralytics
+cv2
+cvzone
+numpy
+PIL

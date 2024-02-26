@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 import io
 
-model = YOLO("ppe.pt")
+model = YOLO('models/ppe.pt')
 
 app = Flask(__name__)
 
