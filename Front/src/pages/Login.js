@@ -11,26 +11,16 @@ import closedEye from '../assets/closed-eye.png';
 import email from '../assets/email.png';
 import password from '../assets/password.png';
 
-export default function Register() {
-  const navigator = useNavigation();
+export default function Login() {
   const [emailValue, setEmailValue] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [showPassword, setShowPassword] = useState({
     password: false,
-    confirmPassword: false,
   });
+  navigator = useNavigation();
 
-  const validateEmail = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setIsValidEmail(emailRegex.test(emailValue));
-  };
-
-  const handleRegister = () => {
-    if (!isValidEmail) {
-      Alert.alert('Erro', 'Por favor, insira um email válido.');
-      return;
-    }
-    navigator.navigate('Login');
+  const handleLogin = () => {
+    navigator.navigate('Home');
   };
 
   const toggleShowPassword = (field) => {
@@ -38,6 +28,11 @@ export default function Register() {
       ...prevState,
       [field]: !prevState[field],
     }));
+  };
+
+  const validateEmail = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsValidEmail(emailRegex.test(emailValue));
   };
 
   return (
@@ -51,32 +46,9 @@ export default function Register() {
             source={img}
             style={styles.image}
           />
-          <Text style={styles.text}>Cadastre-se</Text>
+          <Text style={styles.text}>EPI Check</Text>
         </View>
         <View style={styles.container}>
-          <View style={styles.inputContainer}>
-            <Image
-              source={user}
-              style={[styles.icon, { tintColor: '#B5B2B2' }]}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Nome de usuário"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Image
-              source={phone}
-              style={[styles.icon, { tintColor: '#B5B2B2' }]}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Celular"
-              keyboardType="numeric"
-            />
-          </View>
-
           <View style={styles.inputContainer}>
             <Image
               source={email}
@@ -110,34 +82,15 @@ export default function Register() {
               />
             </TouchableOpacity>
           </View>
-
-          <View style={styles.inputContainer}>
-            <Image
-              source={password}
-              style={[styles.icon, { tintColor: '#B5B2B2' }]}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Confirmar senha"
-              secureTextEntry={!showPassword.confirmPassword}
-            />
-            <TouchableOpacity onPress={() => toggleShowPassword('confirmPassword')}>
-              <Image
-                source={showPassword.confirmPassword ? closedEye : eye}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-          </View>
-
           <TouchableOpacity
             style={styles.button}
-            onPress={handleRegister}
+            onPress={handleLogin}
           >
-            <Text style={styles.buttonText}>Registrar</Text>
+            <Text style={styles.buttonText}>Entrar</Text>
           </TouchableOpacity>
           <View style={styles.end}>
             <Text>
-              Já possui uma conta?{' '}
+              Novo por aqui?{' '}
               <Text
                 style={{
                   color: '#1B2946',
@@ -145,10 +98,10 @@ export default function Register() {
                   fontWeight: 'bold',
                 }}
                 onPress={() => {
-                  navigator.navigate('Login');
+                  navigator.navigate('Register');
                 }}
               >
-                Entrar
+                Cadastre-se
               </Text>
             </Text>
           </View>
@@ -168,18 +121,18 @@ const styles = StyleSheet.create({
   init: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 90,
     backgroundColor: '#fff',
   },
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 50,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 145,
+    height: 145,
   },
   input: {
     flex: 1,
@@ -232,9 +185,5 @@ const styles = StyleSheet.create({
   },
   end: {
     marginTop: 15,
-  },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
   },
 });
