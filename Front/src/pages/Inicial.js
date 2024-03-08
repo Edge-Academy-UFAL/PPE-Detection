@@ -4,7 +4,6 @@ import { StyleSheet, Text, View, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import inicial from '../assets/inicial.png';
-import Register from './Register';
 
 export default function Inicial() {
   const { navigate } = useNavigation();
