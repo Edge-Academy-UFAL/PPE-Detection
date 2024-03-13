@@ -56,7 +56,7 @@ export default function Home() {
       <View style={styles.contentSection}>
           <Image
             source={cam}
-            style={styles.imgContent}
+            style={styles.imgBigBrotherIcon}
           />
           <Text style={styles.textContent}>
             Projeto BigBrother
@@ -70,7 +70,7 @@ export default function Home() {
           <View style={styles.buttonSection}>
               <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>
-                  Experimento agora
+                   Em construção
                 </Text>
                 <Image
                   source={setaButton}
@@ -119,15 +119,22 @@ const styles = StyleSheet.create({
     height: 170,
     marginTop: 30,
     borderRadius: 23,
-    marginLeft: 20
+    marginLeft: 20,
+
+    elevation: 10, // Ajuste este valor
+    shadowColor: 'rgba(0, 0, 0, 10)', // Cor da sombra
+    shadowOffset: { width: 0, height: 4 }, // Ajuste este valor
+    shadowOpacity: 0.5, // Opacidade da sombra
+    shadowRadius: 6,
   },
   contentSection: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
+    
   },
   imgContent : {
-    width: 49,
+    width: 51,
     height: 35,
     marginTop: 25,
     marginLeft: 30
@@ -177,5 +184,11 @@ const styles = StyleSheet.create({
     height: 10,
     marginTop: 7,
     marginLeft: 15
+  },
+  imgBigBrotherIcon: {
+    width: 50,
+    height: 45,
+    marginTop: 25,
+    marginLeft: 30
   }
 });
