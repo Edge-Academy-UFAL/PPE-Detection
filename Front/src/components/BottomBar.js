@@ -81,21 +81,21 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     imgIcon: {
-        width: 25,
-        height: 24,
+        width: 22,
+        height: 21,
         marginBottom: 8
     },
     buttonTouch: {
         alignItems: 'center',
     },
     imgIconFalcao: {
-        width: 29,
-        height: 20,
+        width: 28,
+        height: 19,
         marginBottom: 8
     },
     imgIconBigBrother: {
-        width: 27,
-        height: 24.5,
+        width: 26,
+        height: 22.5,
         marginBottom: 8
     }
     
