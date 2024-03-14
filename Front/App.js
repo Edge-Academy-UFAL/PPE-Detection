@@ -6,6 +6,7 @@ import Inicial from './src/pages/Inicial';
 import Register from './src/pages/Register';
 import Login from './src/pages/Login';
 import Home from './src/pages/Home';
+import SendPhoto from './src/pages/SendPhoto';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,13 @@ export default function App() {
           component={Home}
           options={{
             headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name='SendPhoto'
+          component={SendPhoto}
+          options={{
+            headerShown: false
           }}
         />
       </Stack.Navigator>

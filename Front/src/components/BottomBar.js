@@ -5,7 +5,15 @@ import bigBrotherIcon from './assets/bigbrother.png'
 import configIcon from './assets/config.png'
 import falcaoIcon from './assets/falcao.png'
 
+import { useNavigation } from '@react-navigation/native';
+
 export default function BottomBar(){
+
+    navigator = useNavigation();
+
+    const handleFalcao = () => {
+        navigator.navigate('SendPhoto');
+      }
     return(
         <View style={styles.container}>
             <View style={styles.menuContainer}>
@@ -27,7 +35,7 @@ export default function BottomBar(){
                         BigBrother
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonTouch}>
+                <TouchableOpacity style={styles.buttonTouch} onPress={handleFalcao}>
                     <Image
                         source={falcaoIcon}
                         style= {styles.imgIconFalcao}

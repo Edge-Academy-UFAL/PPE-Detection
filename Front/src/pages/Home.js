@@ -1,6 +1,5 @@
 import { StyleSheet, View, Text ,Image,TouchableOpacity } from 'react-native';
 
-
 import img from '../assets/icon.png';
 import EyeIcon from '../assets/bigEye.png'
 import cam from '../assets/cam.png'
@@ -8,7 +7,15 @@ import setaButton from '../assets/setaButton.png'
 
 import BottomBar from '../components/BottomBar';
 
+import { useNavigation } from '@react-navigation/native';
+
 export default function Home() {
+  navigator = useNavigation();
+
+  const handleFalcao = () => {
+    navigator.navigate('SendPhoto');
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
@@ -40,7 +47,7 @@ export default function Home() {
             Ipsum perferendis esse voluptate excepturidolores! esse voluptate
           </Text>
           <View style={styles.buttonSection}>
-              <TouchableOpacity style={styles.button}>
+              <TouchableOpacity style={styles.button} onPress={handleFalcao}>
                 <Text style={styles.buttonText}>
                   Experimento agora
                 </Text>
