@@ -1,13 +1,47 @@
-import { StyleSheet, View, Text ,Image,TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text ,Image,TouchableOpacity, Modal } from 'react-native';
 import BottomBar from '../components/BottomBar';
 
 import img from '../assets/icon.png';
 import iconZoneImage from '../assets/iconZoneImage.png'
+import { useState } from 'react';
 
 export default function SendPhoto(){
 
+    const [modalVisible, setModalVisible] = useState(false)
+
+    const toggleModal = () => {
+        setModalVisible(!modalVisible);
+    };
+
     return(
         <View style={styles.container}>
+
+            <Modal 
+                animationType='none'
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                    setModalVisible(!modalVisible);
+                }}>
+
+                    <View style={styles.containerModal}>
+                        <View style={styles.containerButtonModal}> 
+                            <TouchableOpacity style={[styles.buttonModal, styles.firstButtonModal]} activeOpacity={0.8}>
+                                <Text style={styles.textButtonModal}>Galeria</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.buttonModal, styles.secondyButtonModal]} activeOpacity={0.8}>
+                                <Text style={styles.textButtonModal}>Câmera</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.buttonModal, styles.containerCancelButtonModal]} activeOpacity={0.8} onPress={toggleModal}>
+                                <Text style={[styles.textButton, styles.textCancelButtonModal]}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    
+            </Modal>  
+            
+
             <View style={styles.imageContainer}>
                 <Image
                     source={img}
@@ -15,7 +49,8 @@ export default function SendPhoto(){
                 />
             </View>
             <View style={styles.containerZoneImage}>
-                <TouchableOpacity style={styles.zoneImage} activeOpacity={1} onPress={() => alert('ok')}>
+              
+                <TouchableOpacity style={styles.zoneImage} activeOpacity={1} onPress={toggleModal}>
                     <View style={styles.containerContentZoneImage}>
                         <Image
                             source={iconZoneImage}
@@ -104,5 +139,54 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: '700'
+    },
+
+    containerModal: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        backgroundColor: 'rgba(64, 64, 64, 0.69)',
+        justifyContent: 'flex-end'
+    },
+
+    buttonModal: {
+        width: 355,
+        maxWidth: 355,
+        height: 61,
+        backgroundColor: '#FFFFFFDD',
+        alignItems: 'center',
+        justifyContent: 'center',
+        
+        
+    },
+
+    textButtonModal: {
+        fontSize: 20,
+        fontWeight: '400',
+    },
+
+    firstButtonModal: {
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        borderBottomWidth: 0.5,
+        borderBottomColor: 'black',
+    },
+    secondyButtonModal: {
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
+    },
+    containerButtonModal: {
+        marginBottom: 20
+    },
+
+    textCancelButtonModal: {
+        fontWeight: '700',
+        color: 'black',
+        fontSize: 20
+    },
+
+    containerCancelButtonModal: {
+        marginTop: 10,
+        borderRadius: 10
     }
 })
