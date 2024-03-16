@@ -1,9 +1,11 @@
+import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text ,Image,TouchableOpacity, Modal } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import BottomBar from '../components/BottomBar';
 
 import img from '../assets/icon.png';
 import iconZoneImage from '../assets/iconZoneImage.png'
-import { useState } from 'react';
 
 export default function SendPhoto(){
 
@@ -12,6 +14,18 @@ export default function SendPhoto(){
     const toggleModal = () => {
         setModalVisible(!modalVisible);
     };
+
+    useEffect(() => {
+        async function checkLogin() {
+            const userId = await AsyncStorage.getItem("userId");
+
+            if (!userId) {
+                navigator.replace("Login");
+            }
+        }
+
+        checkLogin();
+    });
 
     return(
         <View style={styles.container}>

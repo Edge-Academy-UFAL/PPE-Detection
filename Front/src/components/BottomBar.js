@@ -11,6 +11,8 @@ export default function BottomBar(){
 
     navigator = useNavigation();
 
+    const routeName = useNavigation().getState().routes[useNavigation().getState().index].name;
+
     const handleFalcao = () => {
         navigator.navigate('SendPhoto');
       }
@@ -62,7 +64,8 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: "#1B2946",
         width: '100%',
-        marginTop:30,
+        position: 'absolute',
+        bottom: 0,
         height: 100,
         borderTopLeftRadius: 16, // Raio para o canto superior esquerdo
         borderTopRightRadius: 16, // Raio para o canto superior direito
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
     },
     imgIcon: {
         width: 22,
-        height: 21,
+        height: 22.5,
         marginBottom: 8
     },
     buttonTouch: {
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
     imgIconBigBrother: {
         width: 26,
         height: 22.5,
-        marginBottom: 8
+        marginBottom: 8,
     }
     
 })

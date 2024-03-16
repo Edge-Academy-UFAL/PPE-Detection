@@ -1,4 +1,9 @@
-import { StyleSheet, View, Text ,Image,TouchableOpacity } from 'react-native';
+import { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import axios from "axios";
 
 import img from '../assets/icon.png';
 import EyeIcon from '../assets/bigEye.png'
@@ -7,10 +12,45 @@ import setaButton from '../assets/setaButton.png'
 
 import BottomBar from '../components/BottomBar';
 
-import { useNavigation } from '@react-navigation/native';
 
 export default function Home() {
   navigator = useNavigation();
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    async function getUser() {
+      const token = await AsyncStorage.getItem('token');
+
+      try {
+        const response = await axios.get(`http://192.168.235.23:3000/users`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        await AsyncStorage.setItem('userId', response.data.id);
+        await AsyncStorage.setItem('userName', response.data.name);
+      }
+      catch (error) {
+        console.log(error);
+        navigator.replace('Login');
+      }
+    }
+
+    async function checkLogin() {
+      const userId = await AsyncStorage.getItem('userId');
+      const userName = await AsyncStorage.getItem('userName');
+
+      if (!userId) {
+        navigator.replace('Login');
+      }
+
+      setUserName(userName);
+    }
+
+    getUser();
+    checkLogin();
+  });
 
   const handleFalcao = () => {
     navigator.navigate('SendPhoto');
@@ -28,7 +68,7 @@ export default function Home() {
         Seja bem-vindo,
       </Text>
       <Text style={styles.userName}>
-        Raul Duarte
+        {userName}
       </Text>
 
       <View style={styles.viewSection}>
@@ -60,31 +100,31 @@ export default function Home() {
         </View>
       </View>
       <View style={styles.viewSection}>
-      <View style={styles.contentSection}>
-          <Image
-            source={cam}
-            style={styles.imgBigBrotherIcon}
-          />
-          <Text style={styles.textContent}>
-            Projeto BigBrother
-          </Text>
-        </View>
-        <View style={styles.containerTextContentSection}>
-          <Text style={styles.textContentSection}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Ipsum perferendis esse voluptate excepturidolores! esse voluptate
-          </Text>
-          <View style={styles.buttonSection}>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>
-                   Em construção
-                </Text>
-                <Image
-                  source={setaButton}
-                  style={styles.setaButton}
-                ></Image>
-              </TouchableOpacity>
+          <View style={styles.contentSection}>
+            <Image
+              source={cam}
+              style={styles.imgBigBrotherIcon}
+            />
+            <Text style={styles.textContent}>
+              Projeto BigBrother
+            </Text>
           </View>
+          <View style={styles.containerTextContentSection}>
+            <Text style={styles.textContentSection}>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. 
+              Ipsum perferendis esse voluptate excepturidolores! esse voluptate
+            </Text>
+            <View style={styles.buttonSection}>
+                <TouchableOpacity style={styles.button}>
+                  <Text style={styles.buttonText}>
+                    Em construção
+                  </Text>
+                  <Image
+                    source={setaButton}
+                    style={styles.setaButton}
+                  ></Image>
+                </TouchableOpacity>
+            </View>
         </View>
       </View>
       <BottomBar/>
@@ -95,10 +135,11 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: {
+    display: 'flex',
     flex: 1,
     backgroundColor: '#fff',
   },
-  imageContainer : {
+  imageContainer: {
     alignItems: 'center',
   },
   image: {
