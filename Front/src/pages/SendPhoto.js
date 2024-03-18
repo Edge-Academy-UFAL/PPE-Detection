@@ -3,15 +3,25 @@ import BottomBar from '../components/BottomBar';
 
 import img from '../assets/icon.png';
 import iconZoneImage from '../assets/iconZoneImage.png'
+import ImgTeste from '../assets/img2.jpg'
 import { useState } from 'react';
+
 
 export default function SendPhoto(){
 
     const [modalVisible, setModalVisible] = useState(false)
 
+    const [isImage, setIsImage] = useState(false)
+
     const toggleModal = () => {
         setModalVisible(!modalVisible);
+        
     };
+
+    const selectImage = () => {
+        setIsImage(!isImage)
+        setModalVisible(!modalVisible)
+    }
 
     return(
         <View style={styles.container}>
@@ -27,7 +37,7 @@ export default function SendPhoto(){
 
                     <View style={styles.containerModal}>
                         <View style={styles.containerButtonModal}> 
-                            <TouchableOpacity style={[styles.buttonModal, styles.firstButtonModal]} activeOpacity={0.8}>
+                            <TouchableOpacity style={[styles.buttonModal, styles.firstButtonModal]} activeOpacity={0.8} onPress={() => selectImage()}>
                                 <Text style={styles.textButtonModal}>Galeria</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.buttonModal, styles.secondyButtonModal]} activeOpacity={0.8}>
@@ -51,6 +61,7 @@ export default function SendPhoto(){
             <View style={styles.containerZoneImage}>
               
                 <TouchableOpacity style={styles.zoneImage} activeOpacity={1} onPress={toggleModal}>
+                    {!isImage? 
                     <View style={styles.containerContentZoneImage}>
                         <Image
                             source={iconZoneImage}
@@ -65,6 +76,12 @@ export default function SendPhoto(){
                             </Text>
                         </View>
                     </View>
+                    :
+                    <Image
+                    source={ImgTeste}
+                    style={styles.imageZone}
+                    />
+                    }
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.buttonSend}>
                     <Text style={styles.textButton}>Enviar Imagem</Text>
@@ -188,5 +205,10 @@ const styles = StyleSheet.create({
     containerCancelButtonModal: {
         marginTop: 10,
         borderRadius: 10
+    },
+
+    imageZone: {
+        width: 343,
+        height: 342,
     }
 })
