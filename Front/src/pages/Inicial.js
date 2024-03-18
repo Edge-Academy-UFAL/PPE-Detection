@@ -32,7 +32,7 @@ export default function Inicial() {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              navigate('Register');
+              navigator.navigate('Register');
             }}
           >
             <Text style={styles.buttonText}>Vamos começar</Text>

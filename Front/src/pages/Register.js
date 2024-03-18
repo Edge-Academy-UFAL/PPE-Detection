@@ -81,7 +81,7 @@ export default function Register() {
     try {
       // const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, {
 
-      const response = await axios.post(`http://192.168.235.23:3000/users`, {
+      const response = await axios.post(`http://192.168.202.64:3000/users`, {
         email: emailValue,
         name: nameValue,
         phone: phoneValue,

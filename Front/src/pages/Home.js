@@ -22,7 +22,7 @@ export default function Home() {
       const token = await AsyncStorage.getItem('token');
 
       try {
-        const response = await axios.get(`http://192.168.235.23:3000/users`, {
+        const response = await axios.get(`http://192.168.202.64:3000/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

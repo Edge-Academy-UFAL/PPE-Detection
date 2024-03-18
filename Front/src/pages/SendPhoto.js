@@ -7,7 +7,8 @@ import BottomBar from '../components/BottomBar';
 import img from '../assets/icon.png';
 import iconZoneImage from '../assets/iconZoneImage.png'
 import ImgTeste from '../assets/img2.jpg'
-import { useState } from 'react';
+
+import * as ImagePicker from 'expo-image-picker'
 
 
 export default function SendPhoto(){
@@ -15,6 +16,8 @@ export default function SendPhoto(){
     const [modalVisible, setModalVisible] = useState(false)
 
     const [isImage, setIsImage] = useState(false)
+
+    const [image, setImage] = useState()
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -38,6 +41,55 @@ export default function SendPhoto(){
         checkLogin();
     });
 
+    const uploadImage = async (mode) => {
+        
+        try {
+            let result = {}
+
+            if (mode === "gallery") {
+                setModalVisible(false)
+                await ImagePicker.requestMediaLibraryPermissionsAsync();
+                result = await ImagePicker.launchImageLibraryAsync({
+                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                    allowsEditing: true,
+                    aspect: [1,1],
+                    quality: 1
+                })
+            }else {
+                setModalVisible(false)
+                await ImagePicker.requestCameraPermissionsAsync()
+                result = await ImagePicker.launchCameraAsync({
+                    cameraType: ImagePicker.CameraType.back,
+                    allowsEditing: true,
+                    aspect: [1,1],
+                    quality: 1
+                })
+
+            }
+
+            if(!result.canceled) {
+                //save image
+                await saveImage(result.assets[0].uri)
+            }
+
+
+        }catch (erro) {
+            alert("ERRO uploadind Image: " + erro.message)
+            setModalVisible(false)
+        }
+
+    }
+
+    const saveImage = async (image) => {
+        try {
+            setImage(image)
+            setIsImage(true)
+        }catch (error) {
+            throw error
+        }
+    }
+
+
     return(
         <View style={styles.container}>
 
@@ -48,14 +100,15 @@ export default function SendPhoto(){
                 onRequestClose={() => {
                     Alert.alert('Modal has been closed.');
                     setModalVisible(!modalVisible);
-                }}>
+                }}
+                >
 
                     <View style={styles.containerModal}>
                         <View style={styles.containerButtonModal}> 
-                            <TouchableOpacity style={[styles.buttonModal, styles.firstButtonModal]} activeOpacity={0.8} onPress={() => selectImage()}>
+                            <TouchableOpacity style={[styles.buttonModal, styles.firstButtonModal]} activeOpacity={0.8} onPress={() => uploadImage('gallery')}>
                                 <Text style={styles.textButtonModal}>Galeria</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.buttonModal, styles.secondyButtonModal]} activeOpacity={0.8}>
+                            <TouchableOpacity style={[styles.buttonModal, styles.secondyButtonModal]} activeOpacity={0.8}  onPress = {() => uploadImage()}>
                                 <Text style={styles.textButtonModal}>Câmera</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.buttonModal, styles.containerCancelButtonModal]} activeOpacity={0.8} onPress={toggleModal}>
@@ -93,7 +146,7 @@ export default function SendPhoto(){
                     </View>
                     :
                     <Image
-                    source={ImgTeste}
+                    source={{ uri: image }}
                     style={styles.imageZone}
                     />
                     }

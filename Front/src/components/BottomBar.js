@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function BottomBar(){
 
-    navigator = useNavigation();
+    const navigator = useNavigation();
 
     const routeName = useNavigation().getState().routes[useNavigation().getState().index].name;
 
