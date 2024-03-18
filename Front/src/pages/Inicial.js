@@ -1,12 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar, TouchableOpacity } from 'react-native';
 import { StyleSheet, Text, View, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import inicial from '../assets/inicial.png';
 
 export default function Inicial() {
-  const { navigate } = useNavigation();
+  const navigator = useNavigation();
+
+  useEffect(() => {
+    async function checkLogin() {
+      const userId = await AsyncStorage.getItem('userId');
+
+      if (userId) {
+        navigator.replace('Home');
+      }
+    }
+
+    checkLogin();
+  }, []);
 
   return (
     <View style={styles.container}>

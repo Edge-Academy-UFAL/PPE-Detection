@@ -11,7 +11,7 @@ const userRoute = require("./src/routes/userRoute");
 app.use("/users", userRoute);
 
 app.get("/", (request, response) => {
-    response.send("Hello World");
+    response.send("Hello World 👋");
 });
 
 app.listen(port, () => {

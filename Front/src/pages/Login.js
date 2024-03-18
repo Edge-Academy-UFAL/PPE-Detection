@@ -1,26 +1,75 @@
-import React, { useState } from 'react';
-import { StatusBar, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StatusBar, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from "react-native";
 import { StyleSheet, View, TextInput, Image, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import axios from 'axios';
 
 import img from '../assets/icon.png';
-import user from '../assets/user.png';
-import phone from '../assets/cellphone.png';
 import eye from '../assets/eye.png';
 import closedEye from '../assets/closed-eye.png';
 import email from '../assets/email.png';
 import password from '../assets/password.png';
 
 export default function Login() {
+  const [isLoading, setIsLoading] = useState(false);
   const [emailValue, setEmailValue] = useState('');
+  const [passwordValue, setPasswordValue] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [showPassword, setShowPassword] = useState({
     password: false,
   });
   navigator = useNavigation();
 
-  const handleLogin = () => {
-    navigator.navigate('Home');
+  useEffect(() => {
+      async function checkLogin() {
+          const userId = await AsyncStorage.getItem("userId");
+
+          if (userId) {
+              navigator.replace("Home");
+          }
+      }
+
+      checkLogin();
+  }, []);
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+
+    if (!emailValue || !passwordValue) {
+        Alert.alert("Erro", "Por favor, preencha todos os campos.");
+        return setIsLoading(false);
+    }
+
+    if (!isValidEmail) {
+        Alert.alert("Erro", "Por favor, insira um email válido.");
+        return setIsLoading(false);
+    }
+
+    try {
+      // const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, {
+
+      const response = await axios.post(`http://192.168.235.23:3000/users/login`, {
+        email: emailValue,
+        password: passwordValue,
+      });
+
+      if (response.status === 200) {
+        const { token } = response.data;
+
+        await AsyncStorage.setItem("token", token);
+
+        navigator.replace('Home');
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        Alert.alert('Erro', 'Email ou senha inválidos. Tente novamente.');
+      }
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login. Tente novamente.');
+    }
+
+    setIsLoading(false);
   };
 
   const toggleShowPassword = (field) => {
@@ -57,6 +106,7 @@ export default function Login() {
             <TextInput
               style={styles.input}
               placeholder="Email"
+              inputMode='email'
               onChangeText={(text) => setEmailValue(text)}
               onBlur={validateEmail}
             />
@@ -74,6 +124,7 @@ export default function Login() {
               style={styles.input}
               placeholder="Senha"
               secureTextEntry={!showPassword.password}
+              onChangeText={(text) => setPasswordValue(text)}
             />
             <TouchableOpacity onPress={() => toggleShowPassword('password')}>
               <Image
@@ -86,7 +137,12 @@ export default function Login() {
             style={styles.button}
             onPress={handleLogin}
           >
-            <Text style={styles.buttonText}>Entrar</Text>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={styles.buttonText} onPress={handleLogin} disabled={isLoading}>
+                {!isLoading && 'Entrar'}
+                {isLoading && <ActivityIndicator color="white" />}
+              </Text>
+            </View>
           </TouchableOpacity>
           <View style={styles.end}>
             <Text>
@@ -185,5 +241,9 @@ const styles = StyleSheet.create({
   },
   end: {
     marginTop: 15,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
   },
 });
