@@ -6,7 +6,6 @@ import BottomBar from '../components/BottomBar';
 
 import img from '../assets/icon.png';
 import iconZoneImage from '../assets/iconZoneImage.png'
-import ImgTeste from '../assets/img2.jpg'
 
 import * as ImagePicker from 'expo-image-picker'
 
@@ -18,6 +17,8 @@ export default function SendPhoto(){
     const [isImage, setIsImage] = useState(false)
 
     const [image, setImage] = useState()
+
+    const [imagemProcessada, setImagemProcessada] = useState(false)
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -89,6 +90,10 @@ export default function SendPhoto(){
         }
     }
 
+    const analisarImagem = async () => {
+        setImagemProcessada(!imagemProcessada)
+    }
+
 
     return(
         <View style={styles.container}>
@@ -128,7 +133,7 @@ export default function SendPhoto(){
             </View>
             <View style={styles.containerZoneImage}>
               
-                <TouchableOpacity style={styles.zoneImage} activeOpacity={1} onPress={toggleModal}>
+                <TouchableOpacity style={styles.zoneImage} activeOpacity={1}>
                     {!isImage? 
                     <View style={styles.containerContentZoneImage}>
                         <Image
@@ -151,9 +156,34 @@ export default function SendPhoto(){
                     />
                     }
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonSend}>
-                    <Text style={styles.textButton}>Enviar Imagem</Text>
-                </TouchableOpacity>
+                {imagemProcessada ? 
+                    <View>
+                        <TouchableOpacity style={styles.buttonSend} >
+                                <Text style={styles.textButton}>Baixar imagem</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.buttonSend}>
+                                <Text style={styles.textButton}>Baixar relatório</Text>
+                            </TouchableOpacity>
+                    </View>
+                        :
+                    image ? (
+                        <View>
+                             <TouchableOpacity style={styles.buttonSend} onPress={toggleModal}>
+                                <Text style={styles.textButton}>Escoher outra imagem</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.buttonSend} onPress={() => analisarImagem()}>
+                                <Text style={styles.textButton}>Analisar Imagem</Text>
+                            </TouchableOpacity>
+                        </View>
+                        ) : (
+                            <TouchableOpacity style={styles.buttonSend} onPress={toggleModal}>
+                                <Text style={styles.textButton}>Enviar Imagem</Text>
+                            </TouchableOpacity>
+                            )
+                        }
+ 
             </View>
             <BottomBar/>
         </View>
