@@ -185,7 +185,7 @@ export default function SendPhoto(){
                         }
  
             </View>
-            <BottomBar/>
+            <BottomBar currentRoute={'SendPhoto'}/>
         </View>
     );
 }

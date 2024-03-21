@@ -50,7 +50,7 @@ export default function Login() {
     try {
       // const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, {
 
-      const response = await axios.post(`http://192.168.202.64:3000/users/login`, {
+      const response = await axios.post(`http://192.168.0.100:3000/users/login`, {
         email: emailValue,
         password: passwordValue,
       });
