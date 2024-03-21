@@ -11,10 +11,19 @@ export default function Inicial() {
 
   useEffect(() => {
     async function checkLogin() {
-      const userId = await AsyncStorage.getItem('userId');
+      const token = await AsyncStorage.getItem('token');
 
-      if (userId) {
-        navigator.replace('Home');
+      try {
+        const response = await axios.get(`http://172.20.9.193:3000/users`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        await AsyncStorage.setItem("userName", response.data.name);
+        navigator.navigate('Home');
+      } catch (error) {
+        console.log(error);
       }
     }
 
