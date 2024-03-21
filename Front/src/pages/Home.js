@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -22,34 +22,30 @@ export default function Home() {
       const token = await AsyncStorage.getItem('token');
 
       try {
-        const response = await axios.get(`http://192.168.0.100:3000/users`, {
+        const response = await axios.get(`http://172.20.9.193:3000/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
   
-        await AsyncStorage.setItem('userId', response.data.id);
         await AsyncStorage.setItem('userName', response.data.name);
+        setUserName(userName);
       }
       catch (error) {
         console.log(error);
-        navigator.replace('Login');
+
+        if (error.response.status === 401) {
+          await AsyncStorage.removeItem('token');
+          await AsyncStorage.removeItem('userName');
+
+          navigator.replace('Login');
+
+          Alert.alert('Sessão expirada, faça login novamente.');
+        }
       }
-    }
-
-    async function checkLogin() {
-      const userId = await AsyncStorage.getItem('userId');
-      const userName = await AsyncStorage.getItem('userName');
-
-      if (!userId) {
-        navigator.replace('Login');
-      }
-
-      setUserName(userName);
     }
 
     getUser();
-    checkLogin();
   });
 
   const handleFalcao = () => {
