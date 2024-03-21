@@ -8,10 +8,9 @@ cap.set(3, 1280)
 cap.set(4, 720)
 
 
-model = YOLO('models/ppe.pt')
+model = YOLO('models/best.pt')
 
-classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 'Person', 'Safety Cone',
-                  'Safety Vest', 'machinery', 'vehicle']
+classNames = ['Hardhat', 'NO-Hardhat', 'NO-Safety Vest', 'No-Safety-glasses', 'Person', 'Safety Vest', 'Safety-glasses', 'no_safety_boots', 'no_safety_gloves', 'safety_boots', 'safety_gloves']
 
 while True:
     success, img = cap.read()

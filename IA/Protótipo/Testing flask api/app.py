@@ -7,15 +7,14 @@ import numpy as np
 from PIL import Image
 import io
 
-model = YOLO('models/ppe.pt')
+model = YOLO('models/best.pt')
 
 app = Flask(__name__)
 
 @app.route('/detect', methods=['POST'])
 def predict():
     # classes que o modelo reconhece
-    classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 'Person', 'Safety Cone',
-                  'Safety Vest', 'machinery', 'vehicle']
+    classNames = ['Hardhat', 'NO-Hardhat', 'NO-Safety Vest', 'No-Safety-glasses', 'Person', 'Safety Vest', 'Safety-glasses', 'no_safety_boots', 'no_safety_gloves', 'safety_boots', 'safety_gloves']
     try:
         file = request.files['image'].read()  # lê o conteúdo do arquivo
         # Converte o conteúdo do arquivo para um objeto PIL.Image
@@ -45,7 +44,7 @@ def predict():
                 # Current class
                 current_class = classNames[cls]
 
-                if conf > 0.3:
+                if conf > 0.1:
                     if current_class == 'Hardhat' or current_class == 'Mask' or current_class == 'Safety Vest':
                         myColor = (0, 255, 0)
                     elif current_class == 'NO-Hardhat' or current_class == 'NO-Mask' or current_class == 'NO-Safety Vest':
