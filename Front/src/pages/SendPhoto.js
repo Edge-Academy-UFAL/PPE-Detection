@@ -94,11 +94,6 @@ export default function SendPhoto(){
         }
     }
 
-    const analisarImagem = async () => {
-        setImagemProcessada(!imagemProcessada)
-    }
-
-
     const sendImageToServer = async () => {
         console.log('AQUI')
         try {
@@ -121,11 +116,19 @@ export default function SendPhoto(){
             console.log('Solicitação concluída:', response);
     
             if (response.ok) {
-
+                
                 const blob = await response.blob();
-                setImagemProcessada(blob)
-                console.log(response.json())
-                setIsImagemProcessada(true)
+
+                const reader = new FileReader();
+
+                reader.onload = () => {
+                    const base64Data = reader.result.split(',')[1]; 
+                    setImagemProcessada(base64Data);
+                    // Sinalizando que a imagem foi processada
+                    setIsImagemProcessada(true);
+                };
+
+                reader.readAsDataURL(blob);
             
                 
             } else {
@@ -193,7 +196,7 @@ export default function SendPhoto(){
                     </View>
                     :
                     <Image
-                    source={isImagemProcessada?  { uri: 'data:image/png;base64,' + imagemProcessada }  : {uri: image}}
+                    source={isImagemProcessada?  { uri: `data:image/jpeg;base64,${imagemProcessada}`}  : {uri: image}}
                     style={styles.imageZone}
                     />
 
