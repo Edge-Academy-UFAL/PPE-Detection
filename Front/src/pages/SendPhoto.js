@@ -9,6 +9,7 @@ import iconZoneImage from '../assets/iconZoneImage.png'
 
 import * as ImagePicker from 'expo-image-picker'
 
+// import { sendImageToServer } from '../services/SendImagemToServer';
 
 export default function SendPhoto(){
 
@@ -18,7 +19,9 @@ export default function SendPhoto(){
 
     const [image, setImage] = useState()
 
-    const [imagemProcessada, setImagemProcessada] = useState(false)
+    const [imagemProcessada, setImagemProcessada] = useState()
+
+    const [isImagemProcessada, setIsImagemProcessada] = useState(false)
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -29,6 +32,7 @@ export default function SendPhoto(){
         setIsImage(!isImage)
         setModalVisible(!modalVisible)
     }
+
 
     useEffect(() => {
         async function checkLogin() {
@@ -95,6 +99,44 @@ export default function SendPhoto(){
     }
 
 
+    const sendImageToServer = async () => {
+        console.log('AQUI')
+        try {
+            const formData = new FormData();
+            formData.append('image', {
+                uri: image,
+                name: 'epi.jpeg', // nome da imagem que será enviada
+                type: 'image/jpeg', // tipo da imagem, ajuste conforme necessário
+            });
+    
+            console.log('Enviando solicitação para o servidor...');
+
+            const response = await fetch('http://192.168.0.103:5000/detect', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('Solicitação concluída:', response);
+    
+            if (response.ok) {
+
+                const blob = await response.blob();
+                setImagemProcessada(blob)
+                console.log(response.json())
+                setIsImagemProcessada(true)
+            
+                
+            } else {
+                console.error('Erro ao enviar imagem para o backend:', response.status);
+            }
+        } catch (error) {
+            console.error('Erro ao enviar imagem para o backend:', error.message);
+        }
+    };
+
+
     return(
         <View style={styles.container}>
 
@@ -134,7 +176,7 @@ export default function SendPhoto(){
             <View style={styles.containerZoneImage}>
               
                 <TouchableOpacity style={styles.zoneImage} activeOpacity={1}>
-                    {!isImage? 
+                    {!isImage ? 
                     <View style={styles.containerContentZoneImage}>
                         <Image
                             source={iconZoneImage}
@@ -151,9 +193,10 @@ export default function SendPhoto(){
                     </View>
                     :
                     <Image
-                    source={{ uri: image }}
+                    source={isImagemProcessada?  { uri: 'data:image/png;base64,' + imagemProcessada }  : {uri: image}}
                     style={styles.imageZone}
                     />
+
                     }
                 </TouchableOpacity>
                 {imagemProcessada ? 
@@ -173,7 +216,7 @@ export default function SendPhoto(){
                                 <Text style={styles.textButton}>Escoher outra imagem</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.buttonSend} onPress={() => analisarImagem()}>
+                            <TouchableOpacity style={styles.buttonSend} onPress={() => sendImageToServer()}>
                                 <Text style={styles.textButton}>Analisar Imagem</Text>
                             </TouchableOpacity>
                         </View>
