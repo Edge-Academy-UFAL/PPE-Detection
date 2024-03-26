@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StatusBar, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from "react-native";
+import {
+  StatusBar,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { StyleSheet, View, TextInput, Image, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,15 +36,15 @@ export default function Register() {
   });
 
   useEffect(() => {
-      async function checkLogin() {
-          const userId = await AsyncStorage.getItem("userId");
+    async function checkLogin() {
+      const userId = await AsyncStorage.getItem('userId');
 
-          if (userId) {
-              navigator.replace("Home");
-          }
+      if (userId) {
+        navigator.replace('Home');
       }
+    }
 
-      checkLogin();
+    checkLogin();
   }, []);
 
   const validateEmail = () => {
@@ -58,21 +64,27 @@ export default function Register() {
     if (text.length === 2) setPhoneValue(`(${text}) `);
     else if (text.length === 10) setPhoneValue(`${text}-`);
     else setPhoneValue(text);
-  }
+  };
 
   const handleRegister = async () => {
     setIsLoading(true);
-    
-    if (!nameValue || !phoneValue || !emailValue || !passwordValue || !confirmPasswordValue) {
+
+    if (
+      !nameValue ||
+      !phoneValue ||
+      !emailValue ||
+      !passwordValue ||
+      !confirmPasswordValue
+    ) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return setIsLoading(false);
     }
-    
+
     if (!isValidEmail) {
       Alert.alert('Erro', 'Por favor, insira um email válido.');
       return setIsLoading(false);
     }
-    
+
     if (!isMatchingPasswords) {
       Alert.alert('Erro', 'As senhas não coincidem.');
       return setIsLoading(false);
@@ -81,7 +93,7 @@ export default function Register() {
     try {
       // const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, {
 
-      const response = await axios.post(`http://192.168.0.100:3000/users`, {
+      const response = await axios.post(`http://192.168.1.107:3000/users`, {
         email: emailValue,
         name: nameValue,
         phone: phoneValue,
@@ -157,7 +169,7 @@ export default function Register() {
             <TextInput
               style={styles.input}
               placeholder="Email"
-              inputMode='email'
+              inputMode="email"
               onChangeText={(text) => setEmailValue(text)}
               onBlur={validateEmail}
             />
@@ -213,7 +225,11 @@ export default function Register() {
             onPress={handleRegister}
           >
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={styles.buttonText} onPress={handleRegister} disabled={isLoading}>
+              <Text
+                style={styles.buttonText}
+                onPress={handleRegister}
+                disabled={isLoading}
+              >
                 {!isLoading && 'Cadastrar'}
                 {isLoading && <ActivityIndicator color="white" />}
               </Text>

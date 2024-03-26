@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import axios from "axios";
+import axios from 'axios';
 
 import img from '../assets/icon.png';
-import EyeIcon from '../assets/bigEye.png'
-import cam from '../assets/cam.png'
-import setaButton from '../assets/setaButton.png'
+import EyeIcon from '../assets/bigEye.png';
+import cam from '../assets/cam.png';
+import setaButton from '../assets/setaButton.png';
 
 import BottomBar from '../components/BottomBar';
-
 
 export default function Home() {
   navigator = useNavigation();
@@ -22,16 +21,15 @@ export default function Home() {
       const token = await AsyncStorage.getItem('token');
 
       try {
-        const response = await axios.get(`http://172.20.9.193:3000/users`, {
+        const response = await axios.get(`http://192.168.1.107:3000/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         await AsyncStorage.setItem('userName', response.data.name);
         setUserName(userName);
-      }
-      catch (error) {
+      } catch (error) {
         console.log(error);
 
         if (error.response.status === 401) {
@@ -50,22 +48,18 @@ export default function Home() {
 
   const handleFalcao = () => {
     navigator.navigate('SendPhoto');
-  }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
-       <Image
-        source={img}
-        style={styles.image}
-      />
+        <Image
+          source={img}
+          style={styles.image}
+        />
       </View>
-      <Text style={styles.title}>
-        Seja bem-vindo,
-      </Text>
-      <Text style={styles.userName}>
-        {userName}
-      </Text>
+      <Text style={styles.title}>Seja bem-vindo,</Text>
+      <Text style={styles.userName}>{userName}</Text>
 
       <View style={styles.viewSection}>
         <View style={styles.contentSection}>
@@ -73,58 +67,52 @@ export default function Home() {
             source={EyeIcon}
             style={styles.imgContent}
           />
-          <Text style={styles.textContent}>
-            Projeto Falcão
-          </Text>
+          <Text style={styles.textContent}>Projeto Falcão</Text>
         </View>
         <View style={styles.containerTextContentSection}>
           <Text style={styles.textContentSection}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Ipsum perferendis esse voluptate excepturidolores! esse voluptate
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum perferendis
+            esse voluptate excepturidolores! esse voluptate
           </Text>
           <View style={styles.buttonSection}>
-              <TouchableOpacity style={styles.button} onPress={handleFalcao}>
-                <Text style={styles.buttonText}>
-                  Experimento agora
-                </Text>
-                <Image
-                  source={setaButton}
-                  style={styles.setaButton}
-                ></Image>
-              </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleFalcao}
+            >
+              <Text style={styles.buttonText}>Experimento agora</Text>
+              <Image
+                source={setaButton}
+                style={styles.setaButton}
+              ></Image>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
       <View style={styles.viewSection}>
-          <View style={styles.contentSection}>
-            <Image
-              source={cam}
-              style={styles.imgBigBrotherIcon}
-            />
-            <Text style={styles.textContent}>
-              Projeto BigBrother
-            </Text>
+        <View style={styles.contentSection}>
+          <Image
+            source={cam}
+            style={styles.imgBigBrotherIcon}
+          />
+          <Text style={styles.textContent}>Projeto BigBrother</Text>
+        </View>
+        <View style={styles.containerTextContentSection}>
+          <Text style={styles.textContentSection}>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum perferendis
+            esse voluptate excepturidolores! esse voluptate
+          </Text>
+          <View style={styles.buttonSection}>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Em construção</Text>
+              <Image
+                source={setaButton}
+                style={styles.setaButton}
+              ></Image>
+            </TouchableOpacity>
           </View>
-          <View style={styles.containerTextContentSection}>
-            <Text style={styles.textContentSection}>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-              Ipsum perferendis esse voluptate excepturidolores! esse voluptate
-            </Text>
-            <View style={styles.buttonSection}>
-                <TouchableOpacity style={styles.button}>
-                  <Text style={styles.buttonText}>
-                    Em construção
-                  </Text>
-                  <Image
-                    source={setaButton}
-                    style={styles.setaButton}
-                  ></Image>
-                </TouchableOpacity>
-            </View>
         </View>
       </View>
-      <BottomBar currentRoute={'Home'}/>
-      
+      <BottomBar currentRoute={'Home'} />
     </View>
   );
 }
@@ -141,21 +129,21 @@ const styles = StyleSheet.create({
   image: {
     width: 100,
     height: 100,
-    marginTop: 35
+    marginTop: 35,
   },
   title: {
     fontSize: 26,
     // fontFamily: "Popins",
     marginLeft: 20,
     fontWeight: '700',
-    marginTop: 30
+    marginTop: 30,
   },
   userName: {
     fontSize: 20,
     color: '#E6830C',
     // fontFamily: "Popins",
     marginLeft: 20,
-    marginTop: 5
+    marginTop: 5,
   },
   viewSection: {
     backgroundColor: '#1B2946',
@@ -175,13 +163,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
-    
   },
-  imgContent : {
+  imgContent: {
     width: 51,
     height: 35,
     marginTop: 25,
-    marginLeft: 30
+    marginLeft: 30,
   },
   textContent: {
     color: '#fff',
@@ -189,13 +176,13 @@ const styles = StyleSheet.create({
     fontSize: 21,
     marginLeft: 20,
     fontFamily: 'Roboto',
-    fontWeight: '700'
+    fontWeight: '700',
   },
   textContentSection: {
     color: '#fff',
     marginLeft: 30,
     // marginBottom: 50,
-    fontSize: 11
+    fontSize: 11,
   },
   containerTextContentSection: {
     flex: 1,
@@ -203,7 +190,7 @@ const styles = StyleSheet.create({
   },
   buttonSection: {
     flex: 1,
-    alignItems: 'flex-end' 
+    alignItems: 'flex-end',
   },
   button: {
     backgroundColor: 'rgba(100, 50, 0, 0.5)',
@@ -214,25 +201,25 @@ const styles = StyleSheet.create({
     height: 23,
     flex: 1,
     maxHeight: 23,
-    flexDirection: 'row' 
+    flexDirection: 'row',
   },
   buttonText: {
     fontSize: 10,
     color: '#E6830C',
     alignItems: 'center',
     marginTop: 4,
-    marginLeft: 10
+    marginLeft: 10,
   },
   setaButton: {
     width: 5.2,
     height: 10,
     marginTop: 7,
-    marginLeft: 15
+    marginLeft: 15,
   },
   imgBigBrotherIcon: {
     width: 50,
     height: 45,
     marginTop: 25,
-    marginLeft: 30
-  }
+    marginLeft: 30,
+  },
 });

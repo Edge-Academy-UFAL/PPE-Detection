@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import { StatusBar, TouchableOpacity } from 'react-native';
 import { StyleSheet, Text, View, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import axios from 'axios';
 
 import inicial from '../assets/inicial.png';
 
@@ -14,13 +16,16 @@ export default function Inicial() {
       const token = await AsyncStorage.getItem('token');
 
       try {
-        const response = await axios.get(`http://172.20.9.193:3000/users`, {
+        const response = await axios.get(
+          `http://192.168.1.107:3000/users`,
+          {
             headers: {
-                Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
-        });
+          }
+        );
 
-        await AsyncStorage.setItem("userName", response.data.name);
+        await AsyncStorage.setItem('userName', response.data.name);
         navigator.navigate('Home');
       } catch (error) {
         console.log(error);

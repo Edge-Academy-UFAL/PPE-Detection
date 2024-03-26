@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { StatusBar, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from "react-native";
+import {
+  StatusBar,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { StyleSheet, View, TextInput, Image, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from 'axios';
 
@@ -23,42 +29,48 @@ export default function Login() {
   navigator = useNavigation();
 
   useEffect(() => {
-      async function checkLogin() {
-          const userId = await AsyncStorage.getItem("userId");
+    async function checkLogin() {
+      const userId = await AsyncStorage.getItem('userId');
 
-          if (userId) {
-              navigator.replace("Home");
-          }
+      if (userId) {
+        navigator.replace('Home');
       }
+    }
 
-      checkLogin();
+    checkLogin();
   }, []);
 
   const handleLogin = async () => {
     setIsLoading(true);
 
     if (!emailValue || !passwordValue) {
-        Alert.alert("Erro", "Por favor, preencha todos os campos.");
-        return setIsLoading(false);
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return setIsLoading(false);
     }
 
     if (!isValidEmail) {
-        Alert.alert("Erro", "Por favor, insira um email válido.");
-        return setIsLoading(false);
+      Alert.alert('Erro', 'Por favor, insira um email válido.');
+      return setIsLoading(false);
     }
 
     try {
-      // const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, {
-
-      const response = await axios.post(`http://192.168.0.100:3000/users/login`, {
-        email: emailValue,
-        password: passwordValue,
-      });
+      const response = await axios.post(
+        `http://192.168.1.107:3000/users/login`,
+        {
+          email: emailValue,
+          password: passwordValue,
+        }
+      );
 
       if (response.status === 200) {
         const { token } = response.data;
 
-        await AsyncStorage.setItem("token", token);
+        console.log(token);
+
+        await AsyncStorage.setItem('token', token);
+
+        const token2 = await AsyncStorage.getItem('token');
+        console.log(token2);
 
         navigator.replace('Home');
       }
@@ -106,7 +118,7 @@ export default function Login() {
             <TextInput
               style={styles.input}
               placeholder="Email"
-              inputMode='email'
+              inputMode="email"
               onChangeText={(text) => setEmailValue(text)}
               onBlur={validateEmail}
             />
@@ -138,7 +150,11 @@ export default function Login() {
             onPress={handleLogin}
           >
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={styles.buttonText} onPress={handleLogin} disabled={isLoading}>
+              <Text
+                style={styles.buttonText}
+                onPress={handleLogin}
+                disabled={isLoading}
+              >
                 {!isLoading && 'Entrar'}
                 {isLoading && <ActivityIndicator color="white" />}
               </Text>
