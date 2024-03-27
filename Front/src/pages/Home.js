@@ -20,6 +20,7 @@ export default function Home() {
     async function getUser() {
       const token = await AsyncStorage.getItem('token');
 
+
       try {
         const response = await axios.get(`http://192.168.1.107:3000/users`, {
           headers: {
@@ -71,8 +72,7 @@ export default function Home() {
         </View>
         <View style={styles.containerTextContentSection}>
           <Text style={styles.textContentSection}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum perferendis
-            esse voluptate excepturidolores! esse voluptate
+          Ferramenta utiliza inteligência artificial para analisar imagens e reconhecer o uso de Equipamentos de Proteção Individual (EPIs).
           </Text>
           <View style={styles.buttonSection}>
             <TouchableOpacity
@@ -98,8 +98,7 @@ export default function Home() {
         </View>
         <View style={styles.containerTextContentSection}>
           <Text style={styles.textContentSection}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum perferendis
-            esse voluptate excepturidolores! esse voluptate
+          Ferramenta utiliza inteligência artificial para analisar live streams e reconhecer o uso de Equipamentos de Proteção Individual (EPIs).
           </Text>
           <View style={styles.buttonSection}>
             <TouchableOpacity style={styles.button}>
