@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, Modal } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Alert,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import BottomBar from '../components/BottomBar';
@@ -19,6 +27,8 @@ export default function SendPhoto() {
   const [imagemProcessada, setImagemProcessada] = useState();
 
   const [isImagemProcessada, setIsImagemProcessada] = useState(false);
+
+  const [sendingImage, setSendingImage] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -85,8 +95,8 @@ export default function SendPhoto() {
   };
 
   const sendImageToServer = async () => {
-    console.log('AQUI');
     try {
+
       const formData = new FormData();
       formData.append('image', {
         uri: image,
@@ -96,13 +106,18 @@ export default function SendPhoto() {
 
       console.log('Enviando solicitação para o servidor...');
 
-      const response = await fetch('http://192.168.0.103:5000/detect', {
+      setSendingImage(true);
+
+      const response = await fetch('http://192.168.1.107:5000/detect', {
         method: 'POST',
         body: formData,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+
+      setSendingImage(false);
+
       console.log('Solicitação concluída:', response);
 
       if (response.ok) {
@@ -119,9 +134,11 @@ export default function SendPhoto() {
 
         reader.readAsDataURL(blob);
       } else {
+        Alert.alert('Erro ao enviar imagem para o servidor:', response.status);
         console.error('Erro ao enviar imagem para o backend:', response.status);
       }
     } catch (error) {
+      Alert.alert('Erro ao enviar imagem para o servidor:', error.message);
       console.error('Erro ao enviar imagem para o backend:', error.message);
     }
   };
@@ -176,6 +193,7 @@ export default function SendPhoto() {
         <TouchableOpacity
           style={styles.zoneImage}
           activeOpacity={1}
+          onPress={toggleModal}
         >
           {!isImage ? (
             <View style={styles.containerContentZoneImage}>
@@ -219,13 +237,17 @@ export default function SendPhoto() {
             <TouchableOpacity
               style={styles.buttonSend}
               onPress={toggleModal}
+              id="buttonChooseAnotherImage"
+              disabled={sendingImage}
             >
-              <Text style={styles.textButton}>Escoher outra imagem</Text>
+              <Text style={styles.textButton}>Escolher outra imagem</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.buttonSend}
               onPress={() => sendImageToServer()}
+              id="sendImageToServer"
+              disabled={sendingImage}
             >
               <Text style={styles.textButton}>Analisar Imagem</Text>
             </TouchableOpacity>

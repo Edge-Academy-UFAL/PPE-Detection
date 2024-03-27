@@ -7,14 +7,15 @@ import numpy as np
 from PIL import Image
 import io
 
-model = YOLO('models/best.pt')
+model = YOLO('./IA/models/ppe.pt')
 
 app = Flask(__name__)
 
 @app.route('/detect', methods=['POST'])
 def predict():
     # classes que o modelo reconhece
-    classNames = ['Hardhat', 'NO-Hardhat', 'NO-Safety Vest', 'No-Safety-glasses', 'Person', 'Safety Vest', 'Safety-glasses', 'no_safety_boots', 'no_safety_gloves', 'safety_boots', 'safety_gloves']
+    classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 'Person', 'Safety Cone',
+                  'Safety Vest', 'machinery', 'vehicle']
     try:
         file = request.files['image'].read()  # lê o conteúdo do arquivo
         # Converte o conteúdo do arquivo para um objeto PIL.Image
@@ -44,18 +45,16 @@ def predict():
                 # Current class
                 current_class = classNames[cls]
 
-                if conf > 0.1:
-                    if current_class == 'Hardhat' or current_class == 'Mask' or current_class == 'Safety Vest':
-                        myColor = (0, 255, 0)
-                    elif current_class == 'NO-Hardhat' or current_class == 'NO-Mask' or current_class == 'NO-Safety Vest':
-                        myColor = (0, 0, 255)
-                    else:
+                if conf > 0.5:
+                    if current_class == 'NO-Hardhat' or current_class == 'NO-Mask' or current_class == 'NO-Safety Vest':
+                        # Cor vermelha
                         myColor = (255, 0, 0)
-
-                    cvzone.putTextRect(image_np, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1,
+                        cvzone.putTextRect(image_np, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1,
                                        thickness=1, colorB=myColor, colorT=(255, 255, 255), colorR=myColor, offset=5)
 
-                    cv2.rectangle(image_np, (x1, y1), (x2, y2), myColor, 3)
+                        cv2.rectangle(image_np, (x1, y1), (x2, y2), myColor, 3)
+                    else:
+                        continue
 
         # Converte o objeto numpy.array para um objeto PIL.Image
         image_output = Image.fromarray(image_np)
@@ -137,4 +136,4 @@ def detect():
         return str(e), 400
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.0.103')
+    app.run(debug=True, host='192.168.1.107')
