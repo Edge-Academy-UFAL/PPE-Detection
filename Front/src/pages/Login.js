@@ -10,6 +10,8 @@ import { StyleSheet, View, TextInput, Image, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { API_URL } from "@env";
+
 import axios from 'axios';
 
 import img from '../assets/icon.png';
@@ -29,15 +31,28 @@ export default function Login() {
   navigator = useNavigation();
 
   useEffect(() => {
-    async function checkLogin() {
-      const userId = await AsyncStorage.getItem('userId');
+    async function checkAuthenticated() {
+        const token = await AsyncStorage.getItem("token");
 
-      if (userId) {
-        navigator.replace('Home');
-      }
+        try {
+            const response = await axios.get(`${API_URL}:3000/users`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            await AsyncStorage.setItem("userName", response.data.name);
+
+            navigator.replace("Home");
+        } catch (error) {
+            console.log(error);
+
+            await AsyncStorage.removeItem("token");
+            await AsyncStorage.removeItem("userName");
+        }
     }
 
-    checkLogin();
+    checkAuthenticated();
   }, []);
 
   const handleLogin = async () => {
@@ -55,7 +70,7 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        `http://192.168.1.107:3000/users/login`,
+        `${API_URL}:3000/users/login`,
         {
           email: emailValue,
           password: passwordValue,
@@ -65,20 +80,15 @@ export default function Login() {
       if (response.status === 200) {
         const { token } = response.data;
 
-        console.log(token);
-
         await AsyncStorage.setItem('token', token);
-
-        const token2 = await AsyncStorage.getItem('token');
-        console.log(token2);
-
         navigator.replace('Home');
       }
     } catch (error) {
       if (error.response?.status === 401) {
-        Alert.alert('Erro', 'Email ou senha inválidos. Tente novamente.');
+        setIsLoading(false);
+        return Alert.alert('Erro', 'Email ou senha inválidos. Tente novamente.');
       }
-      Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login. Tente novamente.');
+      Alert.alert("Erro", `Ocorreu um erro ao tentar fazer login. Tente novamente. ${API_URL}:3000`);
     }
 
     setIsLoading(false);

@@ -1,33 +1,28 @@
 import { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Modal,
-  Alert,
-} from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, Modal, Alert } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import axios from "axios";
+import { API_URL } from "@env";
 
 import BottomBar from '../components/BottomBar';
 
 import img from '../assets/icon.png';
+import back from '../assets/back.png';
 import iconZoneImage from '../assets/iconZoneImage.png';
 
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from "expo-file-system";
+import * as Linking from "expo-linking";
+import * as MediaLibrary from "expo-media-library";
+import * as Sharing from "expo-sharing";
 
 export default function SendPhoto() {
   const [modalVisible, setModalVisible] = useState(false);
-
   const [isImage, setIsImage] = useState(false);
-
   const [image, setImage] = useState();
-
   const [imagemProcessada, setImagemProcessada] = useState();
-
   const [isImagemProcessada, setIsImagemProcessada] = useState(false);
-
   const [sendingImage, setSendingImage] = useState(false);
 
   const toggleModal = () => {
@@ -40,15 +35,32 @@ export default function SendPhoto() {
   };
 
   useEffect(() => {
-    async function checkLogin() {
-      const userId = await AsyncStorage.getItem('token');
+    async function getUser() {
+        const token = await AsyncStorage.getItem("token");
 
-      if (!userId) {
-        navigator.replace('Login');
-      }
+        try {
+            const response = await axios.get(`${API_URL}:3000/users`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            await AsyncStorage.setItem("userName", response.data.name);
+        } catch (error) {
+            console.log(error);
+
+            if (error.response.status === 401) {
+                await AsyncStorage.removeItem("token");
+                await AsyncStorage.removeItem("userName");
+
+                navigator.replace("Login");
+
+                Alert.alert("Sessão expirada, faça login novamente.");
+            }
+        }
     }
 
-    checkLogin();
+    getUser();
   });
 
   const uploadImage = async (mode) => {
@@ -94,6 +106,90 @@ export default function SendPhoto() {
     }
   };
 
+  const downloadImage = async () => {
+      const base64Data = imagemProcessada; // Your Base64 encoded image data
+      const uri = FileSystem.documentDirectory + "result.jpg"; // File URI to save the image
+
+      try {
+        await FileSystem.writeAsStringAsync(uri, base64Data, {
+            encoding: FileSystem.EncodingType.Base64,
+        });
+
+        const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
+
+        if (mediaLibraryPermission.status === "granted") {
+          await MediaLibrary.createAssetAsync(uri);
+          Alert.alert("Imagem salva com sucesso!", "A imagem foi salva na galeria do seu dispositivo.");
+        } else {
+          Alert.alert("Permissão negada", "Você precisa permitir o acesso à galeria para salvar a imagem.");
+          Linking.openSettings();
+        }
+      } catch (error) {
+          console.error("Error saving image:", error);
+      }
+  };
+
+
+  const donwloadReport = async () => {
+    const formData = new FormData();
+    formData.append("image", {
+        uri: image,
+        name: "epi.jpeg", // nome da imagem que será enviada
+        type: "image/jpeg", // tipo da imagem, ajuste conforme necessário
+    });
+
+    try {
+      const response = await fetch('${API_URL}:5000/report', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.ok) {
+        try {
+          const pdfBlob = await response.blob();
+          
+          const reader = new FileReader();
+          reader.readAsDataURL(pdfBlob);
+
+          reader.onload = async () => {
+            const base64Data = reader.result.split(',')[1];
+
+            const pdfUri = FileSystem.cacheDirectory + "report.pdf";
+
+            await FileSystem.writeAsStringAsync(pdfUri, base64Data, {
+              encoding: FileSystem.EncodingType.Base64,
+            });
+
+            await Sharing.shareAsync(pdfUri);
+          };
+        } catch (error) {
+          Alert.alert("Erro ao baixar relatório:", error.message);
+          console.error("Erro ao baixar relatório:", error.message);
+        }
+      }
+    } catch (error) {
+      Alert.alert('Erro ao baixar relatório:', error.message);
+      console.error('Erro ao baixar relatório:', error.message);
+    }
+  };
+
+  const backNavigation = () => {
+    console.log("fui clicado");
+    if (isImage || isImagemProcessada) {
+      setIsImage(false);
+      setImage(null);
+      setImagemProcessada(null);
+      setIsImagemProcessada(false);
+    }
+
+    else {
+      navigator.replace('Home');
+    }
+  };
+
   const sendImageToServer = async () => {
     try {
 
@@ -108,7 +204,7 @@ export default function SendPhoto() {
 
       setSendingImage(true);
 
-      const response = await fetch('http://192.168.1.107:5000/detect', {
+      const response = await fetch('${API_URL}:5000/detect', {
         method: 'POST',
         body: formData,
         headers: {
@@ -183,7 +279,16 @@ export default function SendPhoto() {
         </View>
       </Modal>
 
-      <View style={styles.imageContainer}>
+      <View style={[styles.imageContainer, { position: 'relative' }]}>
+        <TouchableOpacity
+          onPress={backNavigation}
+        >
+          <Image
+            source={back}
+            style={{ width: 30, height: 30, position: 'absolute', right: 80, top: 0 }}
+          />
+        </TouchableOpacity>
+
         <Image
           source={img}
           style={styles.image}
@@ -212,23 +317,42 @@ export default function SendPhoto() {
               </View>
             </View>
           ) : (
-            <Image
-              source={
-                isImagemProcessada
-                  ? { uri: `data:image/jpeg;base64,${imagemProcessada}` }
-                  : { uri: image }
-              }
-              style={styles.imageZone}
-            />
+            <>
+                {sendingImage && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 10,
+                    }}>
+                    <ActivityIndicator color="#fff" size={70} />
+                    <Text style={{ color: '#fff', marginTop: 30, fontSize: 16, fontWeight: '700' }}>
+                      Aguardando a análise...
+                    </Text>
+                  </View>
+                )}
+              <Image
+                source={
+                  isImagemProcessada
+                    ? { uri: `data:image/jpeg;base64,${imagemProcessada}` }
+                    : { uri: image }
+                }
+                style={styles.imageZone}
+                  />
+            </> 
           )}
         </TouchableOpacity>
-        {imagemProcessada ? (
+        {isImagemProcessada ? (
           <View>
-            <TouchableOpacity style={styles.buttonSend}>
+            <TouchableOpacity style={styles.buttonSend} onPress={downloadImage}>
               <Text style={styles.textButton}>Baixar imagem</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.buttonSend}>
+            <TouchableOpacity style={styles.buttonSend} onPress={donwloadReport}>
               <Text style={styles.textButton}>Baixar relatório</Text>
             </TouchableOpacity>
           </View>
@@ -272,7 +396,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   imageContainer: {
+    display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     width: 100,

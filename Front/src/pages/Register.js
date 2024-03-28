@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from 'axios';
+import { API_URL } from "@env";
 
 import img from '../assets/icon.png';
 import user from '../assets/user.png';
@@ -35,17 +36,30 @@ export default function Register() {
     confirmPassword: false,
   });
 
-  useEffect(() => {
-    async function checkLogin() {
-      const userId = await AsyncStorage.getItem('userId');
+ useEffect(() => {
+     async function checkAuthenticated() {
+         const token = await AsyncStorage.getItem("token");
 
-      if (userId) {
-        navigator.replace('Home');
-      }
-    }
+         try {
+             const response = await axios.get(`${API_URL}:3000/users`, {
+                 headers: {
+                     Authorization: `Bearer ${token}`,
+                 },
+             });
 
-    checkLogin();
-  }, []);
+             await AsyncStorage.setItem("userName", response.data.name);
+
+             navigator.replace("Home");
+         } catch (error) {
+             console.log(error);
+
+             await AsyncStorage.removeItem("token");
+             await AsyncStorage.removeItem("userName");
+         }
+     }
+
+     checkAuthenticated();
+ }, []);
 
   const validateEmail = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -91,9 +105,9 @@ export default function Register() {
     }
 
     try {
-      // const response = await axios.post(`${process.env.REACT_APP_API_URL}/users`, {
+      // const response = await axios.post(`${API_URL}:3000/users`, {
 
-      const response = await axios.post(`http://192.168.1.107:3000/users`, {
+      const response = await axios.post(`${API_URL}:3000/users`, {
         email: emailValue,
         name: nameValue,
         phone: phoneValue,

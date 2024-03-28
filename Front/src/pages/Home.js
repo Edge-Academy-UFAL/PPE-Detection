@@ -4,10 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from 'axios';
+import { API_URL } from "@env";
 
 import img from '../assets/icon.png';
 import EyeIcon from '../assets/bigEye.png';
 import cam from '../assets/cam.png';
+import logoutIcon from "../assets/logout.png";
+import back from "../assets/back.png";
 import setaButton from '../assets/setaButton.png';
 
 import BottomBar from '../components/BottomBar';
@@ -20,9 +23,8 @@ export default function Home() {
     async function getUser() {
       const token = await AsyncStorage.getItem('token');
 
-
       try {
-        const response = await axios.get(`http://192.168.1.107:3000/users`, {
+        const response = await axios.get(`${API_URL}:3000/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -51,13 +53,39 @@ export default function Home() {
     navigator.navigate('SendPhoto');
   };
 
+  const logout = async () => {
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("userName");
+
+      navigator.replace("Login");
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
+      <View style={[styles.imageContainer, { position: 'relative' }]}>
+        <TouchableOpacity
+          onPress={() => {}}
+        >
+          <Image
+            source={back}
+            // make it look disabled
+            style={{ width: 30, height: 30, position: 'absolute', right: 80, top: 0, opacity: 0.4 }}
+            />
+        </TouchableOpacity>
+
         <Image
           source={img}
           style={styles.image}
         />
+
+        <TouchableOpacity
+          onPress={logout}
+        >
+          <Image
+            source={logoutIcon}
+            style={{ width: 40, height: 40, position: 'absolute', left: 60, top: 0 }}
+          />
+        </TouchableOpacity>
       </View>
       <Text style={styles.title}>Seja bem-vindo,</Text>
       <Text style={styles.userName}>{userName}</Text>
@@ -79,16 +107,16 @@ export default function Home() {
               style={styles.button}
               onPress={handleFalcao}
             >
-              <Text style={styles.buttonText}>Experimento agora</Text>
+              <Text style={styles.buttonText}>Experimente agora</Text>
               <Image
                 source={setaButton}
-                style={styles.setaButton}
+                style={[styles.setaButton, { marginLeft: 8 }]}
               ></Image>
             </TouchableOpacity>
           </View>
         </View>
       </View>
-      <View style={styles.viewSection}>
+      <View style={[styles.viewSection, { backgroundColor: '#414a5a' }]}>
         <View style={styles.contentSection}>
           <Image
             source={cam}
@@ -101,13 +129,13 @@ export default function Home() {
           Ferramenta utiliza inteligência artificial para analisar live streams e reconhecer o uso de Equipamentos de Proteção Individual (EPIs).
           </Text>
           <View style={styles.buttonSection}>
-            <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>Em construção</Text>
+            <View style={styles.button}>
+              <Text style={[styles.buttonText, { marginLeft: 23 }]}>Em construção</Text>
               <Image
                 source={setaButton}
-                style={styles.setaButton}
+                style={[styles.setaButton, { marginLeft: 8 }]}
               ></Image>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -123,7 +151,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   imageContainer: {
+    display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     width: 100,
@@ -147,7 +178,8 @@ const styles = StyleSheet.create({
   viewSection: {
     backgroundColor: '#1B2946',
     width: '100%',
-    height: 170,
+    height: 180,
+    paddingBottom: 20,
     marginTop: 30,
     borderRadius: 23,
     marginLeft: 20,
@@ -190,6 +222,7 @@ const styles = StyleSheet.create({
   buttonSection: {
     flex: 1,
     alignItems: 'flex-end',
+    paddingLeft: 100,
   },
   button: {
     backgroundColor: 'rgba(100, 50, 0, 0.5)',
@@ -206,14 +239,14 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#E6830C',
     alignItems: 'center',
-    marginTop: 4,
-    marginLeft: 10,
+    marginTop: 3,
+    marginLeft: 15,
   },
   setaButton: {
     width: 5.2,
     height: 10,
-    marginTop: 7,
-    marginLeft: 15,
+    marginTop: 6,
+    marginLeft: 5,
   },
   imgBigBrotherIcon: {
     width: 50,

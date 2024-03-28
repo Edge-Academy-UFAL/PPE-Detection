@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from 'axios';
+import { API_URL } from "@env";
 
 import inicial from '../assets/inicial.png';
 
@@ -12,12 +13,12 @@ export default function Inicial() {
   const navigator = useNavigation();
 
   useEffect(() => {
-    async function checkLogin() {
+    async function checkAuthenticated() {
       const token = await AsyncStorage.getItem('token');
 
       try {
         const response = await axios.get(
-          `http://192.168.1.107:3000/users`,
+          `${API_URL}:3000/users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -29,10 +30,13 @@ export default function Inicial() {
         navigator.navigate('Home');
       } catch (error) {
         console.log(error);
+
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("userName");
       }
     }
 
-    checkLogin();
+    checkAuthenticated();
   }, []);
 
   return (
