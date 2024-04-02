@@ -1,0 +1,6 @@
+flask
+ultralytics
+cvzone
+numpy
+weasyprint
+jinja2
