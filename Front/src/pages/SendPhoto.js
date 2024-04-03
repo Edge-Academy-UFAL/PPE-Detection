@@ -183,6 +183,7 @@ export default function SendPhoto() {
       setImage(null);
       setImagemProcessada(null);
       setIsImagemProcessada(false);
+      setSendingImage(false);
     }
 
     else {
