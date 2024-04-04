@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, Modal, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  Alert,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import axios from "axios";
-import { API_URL } from "@env";
+import axios from 'axios';
+import { API_URL } from '@env';
 
 import BottomBar from '../components/BottomBar';
 
@@ -12,10 +21,10 @@ import back from '../assets/back.png';
 import iconZoneImage from '../assets/iconZoneImage.png';
 
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from "expo-file-system";
-import * as Linking from "expo-linking";
-import * as MediaLibrary from "expo-media-library";
-import * as Sharing from "expo-sharing";
+import * as FileSystem from 'expo-file-system';
+import * as Linking from 'expo-linking';
+import * as MediaLibrary from 'expo-media-library';
+import * as Sharing from 'expo-sharing';
 
 export default function SendPhoto() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -36,28 +45,28 @@ export default function SendPhoto() {
 
   useEffect(() => {
     async function getUser() {
-        const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem('token');
 
-        try {
-            const response = await axios.get(`${API_URL}:3000/users`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+      try {
+        const response = await axios.get(`${API_URL}:3000/users`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-            await AsyncStorage.setItem("userName", response.data.name);
-        } catch (error) {
-            console.log(error);
+        await AsyncStorage.setItem('userName', response.data.name);
+      } catch (error) {
+        console.log(error);
 
-            if (error.response.status === 401) {
-                await AsyncStorage.removeItem("token");
-                await AsyncStorage.removeItem("userName");
+        if (error.response.status === 401) {
+          await AsyncStorage.removeItem('token');
+          await AsyncStorage.removeItem('userName');
 
-                navigator.replace("Login");
+          navigator.replace('Login');
 
-                Alert.alert("Sessão expirada, faça login novamente.");
-            }
+          Alert.alert('Sessão expirada, faça login novamente.');
         }
+      }
     }
 
     getUser();
@@ -107,39 +116,44 @@ export default function SendPhoto() {
   };
 
   const downloadImage = async () => {
-      const base64Data = imagemProcessada; // Your Base64 encoded image data
-      const uri = FileSystem.documentDirectory + "result.jpg"; // File URI to save the image
+    const base64Data = imagemProcessada; // Your Base64 encoded image data
+    const uri = FileSystem.documentDirectory + 'result.jpg'; // File URI to save the image
 
-      try {
-        await FileSystem.writeAsStringAsync(uri, base64Data, {
-            encoding: FileSystem.EncodingType.Base64,
-        });
+    try {
+      await FileSystem.writeAsStringAsync(uri, base64Data, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
-        const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
+      const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
 
-        if (mediaLibraryPermission.status === "granted") {
-          await MediaLibrary.createAssetAsync(uri);
-          Alert.alert("Imagem salva com sucesso!", "A imagem foi salva na galeria do seu dispositivo.");
-        } else {
-          Alert.alert("Permissão negada", "Você precisa permitir o acesso à galeria para salvar a imagem.");
-          Linking.openSettings();
-        }
-      } catch (error) {
-          console.error("Error saving image:", error);
+      if (mediaLibraryPermission.status === 'granted') {
+        await MediaLibrary.createAssetAsync(uri);
+        Alert.alert(
+          'Imagem salva com sucesso!',
+          'A imagem foi salva na galeria do seu dispositivo.'
+        );
+      } else {
+        Alert.alert(
+          'Permissão negada',
+          'Você precisa permitir o acesso à galeria para salvar a imagem.'
+        );
+        Linking.openSettings();
       }
+    } catch (error) {
+      console.error('Error saving image:', error);
+    }
   };
-
 
   const donwloadReport = async () => {
     const formData = new FormData();
-    formData.append("image", {
-        uri: image,
-        name: "epi.jpeg", // nome da imagem que será enviada
-        type: "image/jpeg", // tipo da imagem, ajuste conforme necessário
+    formData.append('image', {
+      uri: image,
+      name: 'epi.jpeg', // nome da imagem que será enviada
+      type: 'image/jpeg', // tipo da imagem, ajuste conforme necessário
     });
 
     try {
-      const response = await fetch('${API_URL}:5000/report', {
+      const response = await fetch(`${API_URL}:5000/report`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -150,14 +164,14 @@ export default function SendPhoto() {
       if (response.ok) {
         try {
           const pdfBlob = await response.blob();
-          
+
           const reader = new FileReader();
           reader.readAsDataURL(pdfBlob);
 
           reader.onload = async () => {
             const base64Data = reader.result.split(',')[1];
 
-            const pdfUri = FileSystem.cacheDirectory + "report.pdf";
+            const pdfUri = FileSystem.cacheDirectory + 'report.pdf';
 
             await FileSystem.writeAsStringAsync(pdfUri, base64Data, {
               encoding: FileSystem.EncodingType.Base64,
@@ -166,8 +180,8 @@ export default function SendPhoto() {
             await Sharing.shareAsync(pdfUri);
           };
         } catch (error) {
-          Alert.alert("Erro ao baixar relatório:", error.message);
-          console.error("Erro ao baixar relatório:", error.message);
+          Alert.alert('Erro ao baixar relatório:', error.message);
+          console.error('Erro ao baixar relatório:', error.message);
         }
       }
     } catch (error) {
@@ -177,23 +191,19 @@ export default function SendPhoto() {
   };
 
   const backNavigation = () => {
-    console.log("fui clicado");
+    console.log('fui clicado');
     if (isImage || isImagemProcessada) {
       setIsImage(false);
       setImage(null);
       setImagemProcessada(null);
       setIsImagemProcessada(false);
-      setSendingImage(false);
-    }
-
-    else {
+    } else {
       navigator.replace('Home');
     }
   };
 
   const sendImageToServer = async () => {
     try {
-
       const formData = new FormData();
       formData.append('image', {
         uri: image,
@@ -205,7 +215,7 @@ export default function SendPhoto() {
 
       setSendingImage(true);
 
-      const response = await fetch('${API_URL}:5000/detect', {
+      const response = await fetch(`${API_URL}:5000/detect`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -281,9 +291,7 @@ export default function SendPhoto() {
       </Modal>
 
       <View style={[styles.imageContainer, { position: 'relative' }]}>
-        <TouchableOpacity
-          onPress={backNavigation}
-        >
+        <TouchableOpacity onPress={backNavigation}>
           <Image
             source={back}
             style={{ width: 30, height: 30, position: 'absolute', right: 80, top: 0 }}
@@ -319,23 +327,34 @@ export default function SendPhoto() {
             </View>
           ) : (
             <>
-                {sendingImage && (
-                  <View
+              {sendingImage && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10,
+                  }}
+                >
+                  <ActivityIndicator
+                    color="#fff"
+                    size={70}
+                  />
+                  <Text
                     style={{
-                      position: 'absolute',
-                      width: '100%',
-                      height: '100%',
-                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      zIndex: 10,
-                    }}>
-                    <ActivityIndicator color="#fff" size={70} />
-                    <Text style={{ color: '#fff', marginTop: 30, fontSize: 16, fontWeight: '700' }}>
-                      Aguardando a análise...
-                    </Text>
-                  </View>
-                )}
+                      color: '#fff',
+                      marginTop: 30,
+                      fontSize: 16,
+                      fontWeight: '700',
+                    }}
+                  >
+                    Aguardando a análise...
+                  </Text>
+                </View>
+              )}
               <Image
                 source={
                   isImagemProcessada
@@ -343,17 +362,23 @@ export default function SendPhoto() {
                     : { uri: image }
                 }
                 style={styles.imageZone}
-                  />
-            </> 
+              />
+            </>
           )}
         </TouchableOpacity>
         {isImagemProcessada ? (
           <View>
-            <TouchableOpacity style={styles.buttonSend} onPress={downloadImage}>
+            <TouchableOpacity
+              style={styles.buttonSend}
+              onPress={downloadImage}
+            >
               <Text style={styles.textButton}>Baixar imagem</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.buttonSend} onPress={donwloadReport}>
+            <TouchableOpacity
+              style={styles.buttonSend}
+              onPress={donwloadReport}
+            >
               <Text style={styles.textButton}>Baixar relatório</Text>
             </TouchableOpacity>
           </View>

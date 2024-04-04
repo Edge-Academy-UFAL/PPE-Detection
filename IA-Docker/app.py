@@ -9,7 +9,7 @@ import io
 from jinja2 import Template
 from weasyprint import HTML
 
-model = YOLO('./models/best.pt')
+model = YOLO('./models/ppe.pt')
 
 app = Flask(__name__)
 
@@ -205,7 +205,7 @@ def report():
         detectados = [item for item in report_data if not item['name'].startswith('NO-')]
 
         # Path to your HTML template
-        template_path = './IA/Protótipo/Testing flask api/relatorio.html'
+        template_path = './relatorio.html'
 
         image_output = Image.fromarray(image_np)
 
@@ -233,4 +233,4 @@ def report():
         return str(e)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5000)

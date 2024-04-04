@@ -114,7 +114,7 @@ export default function Register() {
         password: passwordValue,
       });
 
-      if (response.status === 201) {
+      if (response.status == 201) {
         Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
         navigator.navigate('Login');
       }

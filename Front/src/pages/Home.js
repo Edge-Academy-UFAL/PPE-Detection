@@ -4,13 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from 'axios';
-import { API_URL } from "@env";
+import { API_URL } from '@env';
 
 import img from '../assets/icon.png';
 import EyeIcon from '../assets/bigEye.png';
 import cam from '../assets/cam.png';
-import logoutIcon from "../assets/logout.png";
-import back from "../assets/back.png";
+import logoutIcon from '../assets/logout.png';
+import back from '../assets/back.png';
 import setaButton from '../assets/setaButton.png';
 
 import BottomBar from '../components/BottomBar';
@@ -31,7 +31,8 @@ export default function Home() {
         });
 
         await AsyncStorage.setItem('userName', response.data.name);
-        setUserName(userName);
+        let name = await AsyncStorage.getItem('userName');
+        setUserName(name);
       } catch (error) {
         console.log(error);
 
@@ -54,23 +55,28 @@ export default function Home() {
   };
 
   const logout = async () => {
-      await AsyncStorage.removeItem("token");
-      await AsyncStorage.removeItem("userName");
+    await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('userName');
 
-      navigator.replace("Login");
+    navigator.replace('Login');
   };
 
   return (
     <View style={styles.container}>
       <View style={[styles.imageContainer, { position: 'relative' }]}>
-        <TouchableOpacity
-          onPress={() => {}}
-        >
+        <TouchableOpacity onPress={() => {}}>
           <Image
             source={back}
             // make it look disabled
-            style={{ width: 30, height: 30, position: 'absolute', right: 80, top: 0, opacity: 0.4 }}
-            />
+            style={{
+              width: 30,
+              height: 30,
+              position: 'absolute',
+              right: 80,
+              top: 0,
+              opacity: 0.4,
+            }}
+          />
         </TouchableOpacity>
 
         <Image
@@ -78,9 +84,7 @@ export default function Home() {
           style={styles.image}
         />
 
-        <TouchableOpacity
-          onPress={logout}
-        >
+        <TouchableOpacity onPress={logout}>
           <Image
             source={logoutIcon}
             style={{ width: 40, height: 40, position: 'absolute', left: 60, top: 0 }}
@@ -100,7 +104,8 @@ export default function Home() {
         </View>
         <View style={styles.containerTextContentSection}>
           <Text style={styles.textContentSection}>
-          Ferramenta utiliza inteligência artificial para analisar imagens e reconhecer o uso de Equipamentos de Proteção Individual (EPIs).
+            Ferramenta utiliza inteligência artificial para analisar imagens e reconhecer
+            o uso de Equipamentos de Proteção Individual (EPIs).
           </Text>
           <View style={styles.buttonSection}>
             <TouchableOpacity
@@ -126,7 +131,8 @@ export default function Home() {
         </View>
         <View style={styles.containerTextContentSection}>
           <Text style={styles.textContentSection}>
-          Ferramenta utiliza inteligência artificial para analisar live streams e reconhecer o uso de Equipamentos de Proteção Individual (EPIs).
+            Ferramenta utiliza inteligência artificial para analisar live streams e
+            reconhecer o uso de Equipamentos de Proteção Individual (EPIs).
           </Text>
           <View style={styles.buttonSection}>
             <View style={styles.button}>
