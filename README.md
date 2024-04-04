@@ -40,20 +40,19 @@ Este projeto foi desenvolvido utilizando as seguintes tecnologias e bibliotecas:
 Para rodar este projeto em sua máquina local, clone este repositório e execute o comando:
 
 ```sh
-  git clone
+# Clonando o repositório
+git clone
 
-```sh
-  cd Front
-
-  # Instalando as dependências
-  bun install # ou npm install ou yarn
+cd Front
+# Instalando as dependências
+bun install # ou npm install ou yarn
 ```
 
 instalando todas as dependências. Após isso, basta iniciar:
 
 ```sh
-  # Iniciando o projeto
-  bun start # or npm start or yarn start
+# Iniciando o projeto
+bun start # ou npm start ou yarn start
 ```
 
 **⚠ Além disso, certifique-se de preencher as informações necessárias em um arquivo .env usando o arquivo [.env.example](https://github.com/edge-academy-ufal/ppe-detection/blob/main/Front/.env.example) como exemplo ⚠**
@@ -61,10 +60,9 @@ instalando todas as dependências. Após isso, basta iniciar:
 Para o servidor, você precisará somente do Docker e Docker Compose instalados em sua máquina. Após isso, basta executar:
 
 ```sh
-  cd Server
-
-  # Iniciando o servidor
-  docker-compose up -d
+cd Server
+# Iniciando o servidor
+docker-compose up -d
 ```
 
 E pronto! O servidor estará rodando em `http://localhost:3000` (ou a porta que você configurou no arquivo `.env`).
@@ -72,10 +70,9 @@ E pronto! O servidor estará rodando em `http://localhost:3000` (ou a porta que 
 E para o servidor da IA, você precisará do Docker e Docker Compose instalados em sua máquina. Após isso, basta executar:
 
 ```sh
-  cd IA-Docker
-
-  # Iniciando o servidor
-  docker-compose up -d
+cd IA-Docker
+# Iniciando o servidor
+docker-compose up -d
 ```
 
 ---
