@@ -4,13 +4,13 @@ import cvzone
 import math
 
 cap = cv2.VideoCapture(0)  # For Webcam
-cap.set(3, 1280)
-cap.set(4, 720)
+cap.set(3, 1920)
+cap.set(4, 1080)
 
 
-model = YOLO('models/best.pt')
+model = YOLO('IA/models/v1.pt')
 
-classNames = ['Hardhat', 'NO-Hardhat', 'NO-Safety Vest', 'No-Safety-glasses', 'Person', 'Safety Vest', 'Safety-glasses', 'no_safety_boots', 'no_safety_gloves', 'safety_boots', 'safety_gloves']
+classNames = ['capacete', 'colete-de-seguranca', 'luva', 'mascara', 'oculos', 'sapato', 'sem_capacete', 'sem_colete-de-seguranca', 'sem_luva', 'sem_mascara', 'sem_oculos', 'sem_sapato']
 
 while True:
     success, img = cap.read()
@@ -33,9 +33,9 @@ while True:
 
             current_class = classNames[cls]
 
-            if current_class == 'Hardhat' or current_class == 'Mask' or current_class == 'Safety Vest':
+            if current_class == 'capacete' or current_class == 'mascara' or current_class == 'colete-de-seguranca' or current_class == 'luva' or current_class == 'oculos' or current_class == 'sapato':
                         myColor = (0, 255, 0)
-            elif current_class == 'NO-Hardhat' or current_class == 'NO-Mask' or current_class == 'NO-Safety Vest':
+            elif current_class == 'sem_capacete' or current_class == 'sem_mascara' or current_class == 'sem_colete-de-seguranca' or current_class == 'sem_luva' or current_class == 'sem_oculos' or current_class == 'sem_sapato':
                 myColor = (0, 0, 255)
             else:
                 myColor = (255, 0, 0)
