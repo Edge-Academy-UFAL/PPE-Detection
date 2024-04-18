@@ -76,6 +76,65 @@ def video_feed():
 
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/camera_feed')
+def camera_feed():
+    def generate():
+        cap = cv2.VideoCapture(0) 
+        if not cap.isOpened():
+            print("Erro ao acessar a câmera")
+            return
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+           
+            results = model(frame, stream=True)
+
+            
+            for r in results:
+                boxes = r.boxes
+                for box in boxes:
+                    # Bounding Box
+                    x1, y1, x2, y2 = box.xyxy[0]
+                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+                    # Confidence
+                    conf = math.ceil((box.conf[0] * 100)) / 100
+
+                    # Class name
+                    cls = int(box.cls[0])
+
+                    current_class = classNames[cls]
+
+                    if current_class.startswith('sem_'):
+                        missing_epi_set.add(current_class[4:])
+
+                    if current_class in ['capacete', 'mascara', 'colete-de-seguranca', 'luva', 'oculos', 'sapato']:
+
+                        myColor = (0, 255, 0)
+                    elif current_class in ['sem_capacete', 'sem_mascara', 'sem_colete-de-seguranca', 'sem_luva', 'sem_oculos', 'sem_sapato']:
+                        myColor = (0, 0, 255)
+                        
+                    else:
+                        myColor = (255, 0, 0)
+
+                    cvzone.putTextRect(frame, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1, colorB=myColor, colorT=(255, 255, 255), colorR=myColor, offset=5)
+
+            # Codificar o frame em JPEG para transmissão
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+
+            # Envie o frame como parte do stream de vídeo
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        cap.release()
+
+    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
 @app.route('/missing_epi')
 def send_missing_epi():
     global missing_epi_set
@@ -86,4 +145,4 @@ def send_missing_epi():
         return jsonify({})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.1.113')
+    app.run(debug=True, host='192.168.0.102')

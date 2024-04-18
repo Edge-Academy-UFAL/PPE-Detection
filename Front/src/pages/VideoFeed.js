@@ -31,7 +31,7 @@ export default function VideoFeed() {
   return (
     <View style={{ flex: 1 }}>
       <WebView
-        source={{ uri: 'http://192.168.1.113:5000/video_feed' }}
+        source={{ uri: 'http://192.168.0.102:5000/video_feed' }}
         style={{ flex: 1, width: '100%', height: '100%', backgroundColor: 'black' }}
       />
       {missingEpi.length > 0 && (
