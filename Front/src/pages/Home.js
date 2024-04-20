@@ -54,6 +54,10 @@ export default function Home() {
     navigator.navigate('SendPhoto');
   };
 
+  const handleBBB = () => {
+    navigator.navigate('VideoFeed');
+  };
+
   const logout = async () => {
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('userName');
@@ -121,7 +125,7 @@ export default function Home() {
           </View>
         </View>
       </View>
-      <View style={[styles.viewSection, { backgroundColor: '#414a5a' }]}>
+      <View style={[styles.viewSection]}>
         <View style={styles.contentSection}>
           <Image
             source={cam}
@@ -135,13 +139,16 @@ export default function Home() {
             reconhecer o uso de Equipamentos de Proteção Individual (EPIs).
           </Text>
           <View style={styles.buttonSection}>
-            <View style={styles.button}>
-              <Text style={[styles.buttonText, { marginLeft: 23 }]}>Em construção</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleBBB}
+            >
+              <Text style={[styles.buttonText]}>Experimente agora</Text>
               <Image
                 source={setaButton}
                 style={[styles.setaButton, { marginLeft: 8 }]}
               ></Image>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -186,7 +193,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 180,
     paddingBottom: 20,
-    marginTop: 30,
+    marginTop: 10,
     borderRadius: 23,
     marginLeft: 20,
 

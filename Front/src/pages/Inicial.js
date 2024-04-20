@@ -50,7 +50,7 @@ export default function Inicial() {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              navigator.navigate('VideoFeed');
+              navigator.navigate('Register');
             }}
           >
             <Text style={styles.buttonText}>Vamos começar</Text>

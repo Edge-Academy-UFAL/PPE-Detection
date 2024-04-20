@@ -11,7 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from 'axios';
-import { API_URL } from "@env";
+import { API_URL } from '@env';
 
 import img from '../assets/icon.png';
 import user from '../assets/user.png';
@@ -36,30 +36,30 @@ export default function Register() {
     confirmPassword: false,
   });
 
- useEffect(() => {
-     async function checkAuthenticated() {
-         const token = await AsyncStorage.getItem("token");
+  useEffect(() => {
+    async function checkAuthenticated() {
+      const token = await AsyncStorage.getItem('token');
 
-         try {
-             const response = await axios.get(`${API_URL}:3000/users`, {
-                 headers: {
-                     Authorization: `Bearer ${token}`,
-                 },
-             });
+      try {
+        const response = await axios.get(`${API_URL}:3000/users`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-             await AsyncStorage.setItem("userName", response.data.name);
+        await AsyncStorage.setItem('userName', response.data.name);
 
-             navigator.replace("Home");
-         } catch (error) {
-             console.log(error);
+        navigator.replace('Home');
+      } catch (error) {
+        console.log(error);
 
-             await AsyncStorage.removeItem("token");
-             await AsyncStorage.removeItem("userName");
-         }
-     }
+        await AsyncStorage.removeItem('token');
+        await AsyncStorage.removeItem('userName');
+      }
+    }
 
-     checkAuthenticated();
- }, []);
+    checkAuthenticated();
+  }, []);
 
   const validateEmail = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -113,6 +113,8 @@ export default function Register() {
         phone: phoneValue,
         password: passwordValue,
       });
+
+      console.log(response.data);
 
       if (response.status == 201) {
         Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');

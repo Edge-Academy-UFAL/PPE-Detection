@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, Response, jsonify
 from ultralytics import YOLO
 import math
 import cv2
@@ -6,18 +6,20 @@ import cvzone
 import numpy as np
 from PIL import Image
 import io
+import os
 from jinja2 import Template
 from weasyprint import HTML
 
-model = YOLO('./models/ppe.pt')
+model_path = os.path.join(os.path.dirname(__file__), 'models', 'v1.pt')
+
+model = YOLO(model_path)
 
 app = Flask(__name__)
 
 @app.route('/detect', methods=['POST'])
 def predict():
     # classes que o modelo reconhece
-    classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 'Person', 'Safety Cone',
-                  'Safety Vest', 'machinery', 'vehicle']
+    classNames = ['capacete', 'colete-de-seguranca', 'luva', 'mascara', 'oculos', 'sapato', 'sem_capacete', 'sem_colete-de-seguranca', 'sem_luva', 'sem_mascara', 'sem_oculos', 'sem_sapato']
     try:
         file = request.files['image'].read()  # lê o conteúdo do arquivo
         # Converte o conteúdo do arquivo para um objeto PIL.Image
@@ -47,8 +49,8 @@ def predict():
                 # Current class
                 current_class = classNames[cls]
 
-                if conf > 0.5:
-                    if current_class == 'NO-Hardhat' or current_class == 'NO-Mask' or current_class == 'NO-Safety Vest':
+                if conf > 0.3:
+                    if current_class in ['sem_capacete', 'sem_mascara', 'sem_colete-de-seguranca', 'sem_luva', 'sem_oculos', 'sem_sapato']:
                         # Cor vermelha
                         myColor = (255, 0, 0)
                         cvzone.putTextRect(image_np, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1,
@@ -74,19 +76,20 @@ def predict():
 @app.route('/infos', methods=['POST'])
 def detect():
     # classes que o modelo reconhece
-    classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 'Person', 'Safety Cone',
-                  'Safety Vest', 'machinery', 'vehicle']
+    classNames = ['capacete', 'colete-de-seguranca', 'luva', 'mascara', 'oculos', 'sapato', 'sem_capacete', 'sem_colete-de-seguranca', 'sem_luva', 'sem_mascara', 'sem_oculos', 'sem_sapato']
     counts = {
-        'Hardhat': 0,
-        'Mask': 0,
-        'NO-Hardhat': 0,
-        'NO-Mask': 0,
-        'NO-Safety Vest': 0,
-        'Person': 0,
-        'Safety Cone': 0,
-        'Safety Vest': 0,
-        'machinery': 0,
-        'vehicle': 0
+        'capacete': 0,
+        'colete-de-seguranca': 0,
+        'luva': 0,
+        'mascara': 0,
+        'oculos': 0,
+        'sapato': 0,
+        'sem_capacete': 0,
+        'sem_colete-de-seguranca': 0,
+        'sem_luva': 0,
+        'sem_mascara': 0,
+        'sem_oculos': 0,
+        'sem_sapato': 0
     }
     try:
         file = request.files['image'].read()  # lê o conteúdo do arquivo
@@ -118,10 +121,10 @@ def detect():
                 current_class = classNames[cls]
 
                 if conf > 0.3:
-                    if current_class == 'Hardhat' or current_class == 'Mask' or current_class == 'Safety Vest':
+                    if current_class in ['capacete', 'mascara', 'colete-de-seguranca', 'luva', 'oculos', 'sapato']:
                         myColor = (0, 255, 0)
-                    elif current_class == 'NO-Hardhat' or current_class == 'NO-Mask' or current_class == 'NO-Safety Vest':
-                        myColor = (0, 0, 255)
+                    elif current_class in ['sem_capacete', 'sem_mascara', 'sem_colete-de-seguranca', 'sem_luva', 'sem_oculos', 'sem_sapato']:
+                        myColor = (0, 0, 255)                       
                     else:
                         myColor = (255, 0, 0)
                     # Desenha o texto
@@ -140,19 +143,20 @@ def detect():
 @app.route('/report', methods=['POST'])
 def report():
     # classes que o modelo reconhece
-    classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 'Person', 'Safety Cone',
-                  'Safety Vest', 'machinery', 'vehicle']
+    classNames = ['capacete', 'colete-de-seguranca', 'luva', 'mascara', 'oculos', 'sapato', 'sem_capacete', 'sem_colete-de-seguranca', 'sem_luva', 'sem_mascara', 'sem_oculos', 'sem_sapato']
     counts = {
-        'Hardhat': 0,
-        'Mask': 0,
-        'NO-Hardhat': 0,
-        'NO-Mask': 0,
-        'NO-Safety Vest': 0,
-        'Person': 0,
-        'Safety Cone': 0,
-        'Safety Vest': 0,
-        'machinery': 0,
-        'vehicle': 0
+        'capacete': 0,
+        'colete-de-seguranca': 0,
+        'luva': 0,
+        'mascara': 0,
+        'oculos': 0,
+        'sapato': 0,
+        'sem_capacete': 0,
+        'sem_colete-de-seguranca': 0,
+        'sem_luva': 0,
+        'sem_mascara': 0,
+        'sem_oculos': 0,
+        'sem_sapato': 0
     }
     try:
         file = request.files['image'].read()  # lê o conteúdo do arquivo
@@ -184,10 +188,10 @@ def report():
                 current_class = classNames[cls]
 
                 if conf > 0.3:
-                    if current_class == 'Hardhat' or current_class == 'Mask' or current_class == 'Safety Vest':
+                    if current_class in ['capacete', 'mascara', 'colete-de-seguranca', 'luva', 'oculos', 'sapato']:
                         myColor = (0, 255, 0)
-                    elif current_class == 'NO-Hardhat' or current_class == 'NO-Mask' or current_class == 'NO-Safety Vest':
-                        myColor = (0, 0, 255)
+                    elif current_class in ['sem_capacete', 'sem_mascara', 'sem_colete-de-seguranca', 'sem_luva', 'sem_oculos', 'sem_sapato']:
+                        myColor = (0, 0, 255)                       
                     else:
                         myColor = (255, 0, 0)
                     # Desenha o texto

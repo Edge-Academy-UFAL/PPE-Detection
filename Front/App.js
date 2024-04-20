@@ -8,6 +8,7 @@ import Login from './src/pages/Login';
 import Home from './src/pages/Home';
 import SendPhoto from './src/pages/SendPhoto';
 import VideoFeed from './src/pages/VideoFeed';
+import Settings from './src/pages/Settings';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,13 +19,6 @@ export default function App() {
         <Stack.Screen
           name="Inicial"
           component={Inicial}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="VideoFeed"
-          component={VideoFeed}
           options={{
             headerShown: false,
           }}
@@ -51,10 +45,24 @@ export default function App() {
           }}
         />
         <Stack.Screen
-          name='SendPhoto'
+          name="SendPhoto"
           component={SendPhoto}
           options={{
-            headerShown: false
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="VideoFeed"
+          component={VideoFeed}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={Settings}
+          options={{
+            headerShown: false,
           }}
         />
       </Stack.Navigator>

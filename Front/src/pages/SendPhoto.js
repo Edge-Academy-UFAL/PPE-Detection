@@ -227,6 +227,7 @@ export default function SendPhoto() {
 
       console.log('Solicitação concluída:', response);
 
+
       if (response.ok) {
         const blob = await response.blob();
 

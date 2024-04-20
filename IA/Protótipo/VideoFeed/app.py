@@ -2,6 +2,7 @@ from flask import Flask, Response, jsonify
 import cv2
 import cvzone
 import math
+import os
 from ultralytics import YOLO
 
 app = Flask(__name__)
@@ -21,7 +22,9 @@ def read_video(video_path):
 
 video_path = "IA/videos/ppe-1.mp4"
 
-model = YOLO('IA/models/v1.pt')
+model_path = os.path.join(os.path.dirname(__file__), '..', '..','models','v1.pt')
+
+model = YOLO(model_path)
 
 # Defina as classes
 classNames = ['capacete', 'colete-de-seguranca', 'luva', 'mascara', 'oculos', 'sapato', 'sem_capacete', 'sem_colete-de-seguranca', 'sem_luva', 'sem_mascara', 'sem_oculos', 'sem_sapato']
@@ -80,6 +83,7 @@ def video_feed():
 def camera_feed():
     def generate():
         cap = cv2.VideoCapture(0) 
+
         if not cap.isOpened():
             print("Erro ao acessar a câmera")
             return
@@ -89,7 +93,6 @@ def camera_feed():
             if not ret:
                 break
 
-           
             results = model(frame, stream=True)
 
             
@@ -145,4 +148,4 @@ def send_missing_epi():
         return jsonify({})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.0.102')
+    app.run(debug=True, host='192.168.1.113', port=5001)
