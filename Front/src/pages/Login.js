@@ -78,6 +78,12 @@ export default function Login() {
         const { token } = response.data;
 
         await AsyncStorage.setItem('token', token);
+        await AsyncStorage.setItem('Hat', JSON.stringify(true));
+        await AsyncStorage.setItem('Vest', JSON.stringify(true));
+        await AsyncStorage.setItem('Gloves', JSON.stringify(true));
+        await AsyncStorage.setItem('Mask', JSON.stringify(true));
+        await AsyncStorage.setItem('Glass', JSON.stringify(true));
+        await AsyncStorage.setItem('Boot', JSON.stringify(true));
         navigator.replace('Home');
       }
     } catch (error) {

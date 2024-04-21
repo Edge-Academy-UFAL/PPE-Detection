@@ -33,6 +33,45 @@ export default function SendPhoto() {
   const [imagemProcessada, setImagemProcessada] = useState();
   const [isImagemProcessada, setIsImagemProcessada] = useState(false);
   const [sendingImage, setSendingImage] = useState(false);
+  const [classNamesArray, setClassNamesArray] = useState([]);
+
+  useEffect(() => {
+    const getClassNames = async () => {
+      try {
+        // Objeto com os nomes dos itens e seus correspondentes classNames
+        const itemClassNames = {
+          Hat: 'capacete',
+          Vest: 'colete-de-seguranca',
+          Gloves: 'luva',
+          Mask: 'mascara',
+          Glass: 'oculos',
+          Boot: 'sapato',
+        };
+
+        // Array para armazenar os classNames
+        let classNames = [];
+
+        // Loop através do objeto itemClassNames
+        for (const [item, className] of Object.entries(itemClassNames)) {
+          // Verifica se o item está presente no AsyncStorage
+          const value = await AsyncStorage.getItem(item);
+          if (value === 'true') {
+            // Adiciona o className e seu oposto ao array de classNames
+            classNames.push(className);
+            classNames.push(`sem_${className}`);
+          }
+        }
+
+        // Define o array de classNames no state
+        setClassNamesArray(classNames);
+      } catch (error) {
+        console.error('Erro ao buscar os classNames:', error);
+      }
+    };
+
+    // Chamada da função para buscar os classNames
+    getClassNames();
+  }, []);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -146,6 +185,7 @@ export default function SendPhoto() {
 
   const donwloadReport = async () => {
     const formData = new FormData();
+    formData.append('classNames', JSON.stringify(classNamesArray));
     formData.append('image', {
       uri: image,
       name: 'epi.jpeg', // nome da imagem que será enviada
@@ -205,6 +245,7 @@ export default function SendPhoto() {
   const sendImageToServer = async () => {
     try {
       const formData = new FormData();
+      formData.append('classNames', JSON.stringify(classNamesArray));
       formData.append('image', {
         uri: image,
         name: 'epi.jpeg', // nome da imagem que será enviada
@@ -226,7 +267,6 @@ export default function SendPhoto() {
       setSendingImage(false);
 
       console.log('Solicitação concluída:', response);
-
 
       if (response.ok) {
         const blob = await response.blob();

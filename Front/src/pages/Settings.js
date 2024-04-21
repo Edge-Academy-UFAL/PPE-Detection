@@ -36,10 +36,24 @@ export default function Settings() {
   const [vest, setVest] = useState(false);
 
   useEffect(() => {
-    async function getUser() {
-      const token = await AsyncStorage.getItem('token');
-
+    async function fetchData() {
       try {
+        const token = await AsyncStorage.getItem('token');
+
+        const hatValue = (await AsyncStorage.getItem('Hat')) === 'true';
+        const bootValue = (await AsyncStorage.getItem('Boot')) === 'true';
+        const gloveValue = (await AsyncStorage.getItem('Gloves')) === 'true';
+        const maskValue = (await AsyncStorage.getItem('Mask')) === 'true';
+        const glassesValue = (await AsyncStorage.getItem('Glass')) === 'true';
+        const vestValue = (await AsyncStorage.getItem('Vest')) === 'true';
+
+        setHat(hatValue);
+        setBoot(bootValue);
+        setGlove(gloveValue);
+        setMask(maskValue);
+        setGlasses(glassesValue);
+        setVest(vestValue);
+
         const response = await axios.get(`${API_URL}:3000/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -47,12 +61,12 @@ export default function Settings() {
         });
 
         await AsyncStorage.setItem('userName', response.data.name);
-        let name = await AsyncStorage.getItem('userName');
+        const name = await AsyncStorage.getItem('userName');
         setUserName(name);
       } catch (error) {
         console.log(error);
 
-        if (error.response.status === 401) {
+        if (error.response && error.response.status === 401) {
           await AsyncStorage.removeItem('token');
           await AsyncStorage.removeItem('userName');
 
@@ -63,7 +77,7 @@ export default function Settings() {
       }
     }
 
-    getUser();
+    fetchData();
   }, []);
 
   const backNavigation = () => {
@@ -71,7 +85,19 @@ export default function Settings() {
   };
 
   const toggleSave = async () => {
-    //do the logic to save the changes
+    try {
+      await AsyncStorage.setItem('Hat', JSON.stringify(hat));
+      await AsyncStorage.setItem('Boot', JSON.stringify(boot));
+      await AsyncStorage.setItem('Gloves', JSON.stringify(glove));
+      await AsyncStorage.setItem('Mask', JSON.stringify(mask));
+      await AsyncStorage.setItem('Glass', JSON.stringify(glasses));
+      await AsyncStorage.setItem('Vest', JSON.stringify(vest));
+
+      Alert.alert('Alterações salvas com sucesso!');
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro ao salvar as alterações. Por favor, tente novamente mais tarde.');
+    }
   };
 
   return (
