@@ -1,24 +1,12 @@
-from flask import Flask, Response, jsonify
+from flask import Flask, Response, jsonify, request
 import cv2
 import cvzone
 import math
 import os
 from ultralytics import YOLO
+import json
 
 app = Flask(__name__)
-
-# Função para ler o vídeo local
-def read_video(video_path):
-    try:
-        cap = cv2.VideoCapture(video_path)
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
-            yield frame
-        cap.release()
-    except Exception as e:
-        print(f"Erro ao ler o vídeo: {e}")
 
 video_path = "IA/videos/ppe-1.mp4"
 
@@ -31,59 +19,13 @@ classNames = ['capacete', 'colete-de-seguranca', 'luva', 'mascara', 'oculos', 's
 
 missing_epi_set = set()
 
-@app.route('/video_feed')
-def video_feed():
-    def generate():
-        for frame in read_video(video_path):
-            global missing_epi_set
-            missing_epi_set.clear()
-            
-            results = model(frame, stream=True)
-
-            # Processar os resultados
-            for r in results:
-                boxes = r.boxes
-                for box in boxes:
-                    # Bounding Box
-                    x1, y1, x2, y2 = box.xyxy[0]
-                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-
-                    # Confidence
-                    conf = math.ceil((box.conf[0] * 100)) / 100
-
-                    # Class name
-                    cls = int(box.cls[0])
-
-                    current_class = classNames[cls]
-
-                    if current_class.startswith('sem_'):
-                        missing_epi_set.add(current_class[4:])
-
-                    if current_class in ['capacete', 'mascara', 'colete-de-seguranca', 'luva', 'oculos', 'sapato']:
-                        myColor = (0, 255, 0)
-                    elif current_class in ['sem_capacete', 'sem_mascara', 'sem_colete-de-seguranca', 'sem_luva', 'sem_oculos', 'sem_sapato']:
-                        myColor = (0, 0, 255)
-                        
-                    else:
-                        myColor = (255, 0, 0)
-
-                    cvzone.putTextRect(frame, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1, colorB=myColor, colorT=(255, 255, 255), colorR=myColor, offset=5)
-
-            # Codificar o frame em JPEG para transmissão
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            # Envie o frame como parte do stream de vídeo
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+classNames2 = []
 
 @app.route('/camera_feed')
 def camera_feed():
     def generate():
         cap = cv2.VideoCapture(0) 
-
+        print("AQUI2222222222222222222:   ",classNames2)
         if not cap.isOpened():
             print("Erro ao acessar a câmera")
             return
@@ -94,7 +36,6 @@ def camera_feed():
                 break
 
             results = model(frame, stream=True)
-
             
             for r in results:
                 boxes = r.boxes
@@ -111,19 +52,26 @@ def camera_feed():
 
                     current_class = classNames[cls]
 
-                    if current_class.startswith('sem_'):
-                        missing_epi_set.add(current_class[4:])
+                    index = classNames[cls]
 
-                    if current_class in ['capacete', 'mascara', 'colete-de-seguranca', 'luva', 'oculos', 'sapato']:
+                    for i in range(len(classNames2)):
+                        if index == classNames2[i]:
+                            index = i
+                            break
+
+
+                    if current_class in ['capacete', 'mascara', 'colete-de-seguranca', 'luva', 'oculos', 'sapato'] and (current_class in classNames2):
 
                         myColor = (0, 255, 0)
-                    elif current_class in ['sem_capacete', 'sem_mascara', 'sem_colete-de-seguranca', 'sem_luva', 'sem_oculos', 'sem_sapato']:
-                        myColor = (0, 0, 255)
-                        
-                    else:
-                        myColor = (255, 0, 0)
+                        cvzone.putTextRect(frame, f'{classNames2[index]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1, colorB=myColor, colorT=(255, 255, 255), colorR=myColor, offset=5)
 
-                    cvzone.putTextRect(frame, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1, colorB=myColor, colorT=(255, 255, 255), colorR=myColor, offset=5)
+                    elif current_class in ['sem_capacete', 'sem_mascara', 'sem_colete-de-seguranca', 'sem_luva', 'sem_oculos', 'sem_sapato'] and (current_class in classNames2):
+                        myColor = (0, 0, 255)
+                        cvzone.putTextRect(frame, f'{classNames2[index]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1, colorB=myColor, colorT=(255, 255, 255), colorR=myColor, offset=5)
+
+                        missing_epi_set.add(current_class[4:])
+
+                    # cvzone.putTextRect(frame, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1, colorB=myColor, colorT=(255, 255, 255), colorR=myColor, offset=5)
 
             # Codificar o frame em JPEG para transmissão
             ret, buffer = cv2.imencode('.jpg', frame)
@@ -134,6 +82,7 @@ def camera_feed():
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
         cap.release()
+
 
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
@@ -146,6 +95,14 @@ def send_missing_epi():
         return response
     else:
         return jsonify({})
+    
+@app.route('/receiveParams', methods=['POST'])
+def receiveParams():
+    global classNames2
+    data = request.json
+    classNames2 = data.get('classNames')
+    print("AQUI11111111111111111111111111111",classNames2)
+    return jsonify({'status': 'ok'})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.1.113', port=5001)
+    app.run(debug=True, host='192.168.0.103', port=5001)

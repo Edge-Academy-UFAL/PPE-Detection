@@ -9,6 +9,61 @@ import { API_URL } from '@env';
 
 export default function VideoFeed() {
   const [missingEpi, setMissingEpi] = useState([]);
+  const [classNamesArray, setClassNamesArray] = useState([]);
+
+  useEffect(() => {
+    const getClassNames = async () => {
+      try {
+        // Objeto com os nomes dos itens e seus correspondentes classNames
+        const itemClassNames = {
+          Hat: 'capacete',
+          Vest: 'colete-de-seguranca',
+          Gloves: 'luva',
+          Mask: 'mascara',
+          Glass: 'oculos',
+          Boot: 'sapato',
+        };
+
+        // Array para armazenar os classNames
+        let classNames = [];
+
+        // Loop através do objeto itemClassNames
+        for (const [item, className] of Object.entries(itemClassNames)) {
+          // Verifica se o item está presente no AsyncStorage
+          const value = await AsyncStorage.getItem(item);
+          if (value === 'true') {
+            // Adiciona o className e seu oposto ao array de classNames
+            classNames.push(className);
+            classNames.push(`sem_${className}`);
+          }
+        }
+
+        // Define o array de classNames no state
+        setClassNamesArray(classNames);
+        sendClassNames(classNames);
+      } catch (error) {
+        console.error('Erro ao buscar os classNames:', error);
+      }
+    };
+
+    // Chamada da função para buscar os classNames
+    getClassNames();
+    
+  }, []);
+
+  const sendClassNames = async (classNames) => {
+    try {
+      await axios.post('http://192.168.0.103:5001/receiveParams', { classNames });
+
+      for (let i = 0; i < classNames.length; i++) {
+        console.log(classNames[i]);
+      }
+      
+      console.log('Enviado!!')
+    } catch (error) {
+      console.error('Erro ao enviar classNames para o servidor:', error);
+    }
+  };
 
   useEffect(() => {
     async function getUser() {
@@ -42,7 +97,7 @@ export default function VideoFeed() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_URL}:5001/missing_epi`);
+        const response = await axios.get(`http://192.168.0.103:5001/missing_epi`);
         const data = response.data;
         if (data.missing_epi) {
           setMissingEpi(data.missing_epi);
@@ -62,7 +117,7 @@ export default function VideoFeed() {
   return (
     <View style={{ flex: 1 }}>
       <WebView
-        source={{ uri: `${API_URL}:5001/camera_feed` }}
+        source={{ uri: `http://192.168.0.103:5001/camera_feed` }}
         style={{ flex: 1, width: '100%', height: '100%', backgroundColor: 'black' }}
       />
       {missingEpi.length > 0 && (
