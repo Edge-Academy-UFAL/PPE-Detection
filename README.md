@@ -18,7 +18,10 @@
 
 <br>
 
-<https://github.com/Edge-Academy-UFAL/PPE-Detection/assets/62774465/84833bd0-29b8-448f-b415-adfac7502cd9>
+https://github.com/Edge-Academy-UFAL/PPE-Detection/assets/62774465/84833bd0-29b8-448f-b415-adfac7502cd9
+
+https://github.com/Edge-Academy-UFAL/PPE-Detection/assets/62774465/922f2e87-ec34-4285-b76d-fc1f95c36da0
+
 
 ---
 
